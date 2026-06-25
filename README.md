@@ -8,6 +8,7 @@ des séances. Marché initial : **France**.
 > **Android (APK) d'abord, iOS ensuite** — même base de code grâce à React Native / Expo.
 
 📦 **Déploiement pas-à-pas (Supabase + APK) : voir [DEPLOYMENT.md](./DEPLOYMENT.md).**
+⚙️ **Déploiement automatique (GitHub Actions) : voir [CICD.md](./CICD.md).**
 
 ## Stack
 

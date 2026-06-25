@@ -1,0 +1,54 @@
+name: Build app (EAS)
+
+# Lance un build EAS (APK Android / app iOS). Déclenché MANUELLEMENT ou sur un
+# tag de version (vX.Y.Z) — volontairement PAS sur chaque push, pour préserver
+# les 15 builds gratuits/mois d'EAS.
+#
+# Secret GitHub requis :
+#   EXPO_TOKEN   (expo.dev → Account settings → Access tokens)
+#
+# Les variables EXPO_PUBLIC_SUPABASE_URL / _ANON_KEY doivent être configurées
+# comme variables d'environnement EAS (eas env:create ou dashboard Expo), car le
+# bundling a lieu sur les serveurs EAS, pas sur ce runner.
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Plateforme
+        type: choice
+        options: [android, ios, all]
+        default: android
+      profile:
+        description: Profil de build
+        type: choice
+        options: [preview, production]
+        default: preview
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Lancer le build EAS
+        run: |
+          eas build \
+            --platform "${{ github.event.inputs.platform || 'android' }}" \
+            --profile "${{ github.event.inputs.profile || 'preview' }}" \
+            --non-interactive --no-wait

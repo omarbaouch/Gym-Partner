@@ -1,0 +1,43 @@
+name: Deploy backend (Supabase)
+
+# Déploie automatiquement le schéma (migrations) et les Edge Functions à chaque
+# push sur main touchant supabase/**. Déclenchable aussi manuellement.
+#
+# Secrets GitHub requis (Settings → Secrets and variables → Actions) :
+#   SUPABASE_ACCESS_TOKEN   (compte Supabase → Account → Access Tokens)
+#   SUPABASE_PROJECT_REF    (ref du projet, dans l'URL du dashboard)
+#   SUPABASE_DB_PASSWORD    (mot de passe de la base, choisi à la création)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/**'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link au projet
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
+        env:
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+
+      - name: Appliquer les migrations
+        run: supabase db push
+
+      - name: Déployer les Edge Functions
+        run: |
+          supabase functions deploy notify-message
+          supabase functions deploy delete-account
