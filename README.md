@@ -49,15 +49,20 @@ Notifications push : déployer la fonction puis brancher un Database Webhook
 
 ```bash
 supabase functions deploy notify-message
+supabase functions deploy delete-account      # suppression de compte (RGPD)
 ```
 
 ## Build APK (Android)
 
 ```bash
+npm run icons                                 # (re)génère les icônes placeholder
 eas login
-eas build:configure
-eas build -p android --profile preview        # produit un .apk installable
+eas init                                       # crée le projet EAS (renseigne extra.eas.projectId)
+eas build -p android --profile preview         # produit un .apk installable
 ```
+
+> Les icônes dans `assets/` sont des placeholders générés (`npm run icons`) ;
+> remplace-les par le vrai design avant publication.
 
 iOS plus tard : `eas build -p ios` (Sign in with Apple à ajouter) — aucune réécriture.
 
@@ -91,5 +96,5 @@ supabase/
 - [x] Phase 1 — Auth & profil (onboarding complet, upload avatar)
 - [x] Phase 2 — Salles & découverte (import OSM, carte + géoloc, filtres)
 - [x] Phase 3 — Chat & push (temps réel, accusés de lecture, non-lus, notifications)
-- [ ] Phase 4 — Sécurité & sortie Android (modération, build APK, test interne Play)
+- [x] Phase 4 — Sécurité & sortie Android (blocage/signalement, suppression RGPD, icônes, build APK)
 - [ ] Phase 5 — iOS (Sign in with Apple, build & soumission App Store)

@@ -12,6 +12,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
     "typecheck": "tsc --noEmit",
     "test": "jest",
+    "icons": "node scripts/generate-icons.mjs",
     "db:types": "supabase gen types typescript --local > src/types/database.ts",
     "prepare": "husky"
   },

@@ -5,11 +5,18 @@ import { ActivityIndicator, Alert, Text, View } from 'react-native';
 
 import { Button } from '@/components/Button';
 import { Screen } from '@/components/Screen';
+import {
+  REPORT_REASONS,
+  useBlockUser,
+  useReportUser,
+} from '@/features/moderation/useModeration';
 import { supabase } from '@/lib/supabase';
 
 export default function MemberProfile() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const blockUser = useBlockUser();
+  const reportUser = useReportUser();
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['profile', id],
@@ -34,6 +41,37 @@ export default function MemberProfile() {
       return;
     }
     router.push({ pathname: '/chat/[id]', params: { id: data as string } });
+  }
+
+  function onBlock() {
+    Alert.alert('Bloquer', 'Cette personne ne pourra plus te voir ni te contacter.', [
+      { text: 'Annuler', style: 'cancel' },
+      {
+        text: 'Bloquer',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await blockUser.mutateAsync(id!);
+            router.back();
+          } catch (e) {
+            Alert.alert('Erreur', e instanceof Error ? e.message : 'Échec du blocage');
+          }
+        },
+      },
+    ]);
+  }
+
+  function onReport() {
+    Alert.alert('Signaler', 'Motif du signalement', [
+      ...REPORT_REASONS.map((reason) => ({
+        text: reason,
+        onPress: async () => {
+          await reportUser.mutateAsync({ otherId: id!, reason });
+          Alert.alert('Merci', 'Signalement transmis à la modération.');
+        },
+      })),
+      { text: 'Annuler', style: 'cancel' as const },
+    ]);
   }
 
   if (isLoading || !profile) {
@@ -70,6 +108,15 @@ export default function MemberProfile() {
       </View>
 
       <Button label="Contacter" onPress={contact} />
+
+      <View className="flex-row justify-center gap-6 pt-4">
+        <Text className="text-muted" onPress={onReport}>
+          Signaler
+        </Text>
+        <Text className="text-muted" onPress={onBlock}>
+          Bloquer
+        </Text>
+      </View>
     </Screen>
   );
 }
