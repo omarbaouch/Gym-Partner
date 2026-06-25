@@ -1,0 +1,57 @@
+{
+  "expo": {
+    "name": "Gym Partner",
+    "slug": "gym-partner",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "gympartner",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0B0B0F"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.gympartner.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Gym Partner utilise votre position pour trouver les salles de sport proches de vous."
+      }
+    },
+    "android": {
+      "package": "com.gympartner.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0B0B0F"
+      },
+      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Gym Partner utilise votre position pour trouver les salles de sport proches de vous."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Gym Partner accède à vos photos pour définir votre photo de profil."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "00000000-0000-0000-0000-000000000000"
+      }
+    }
+  }
+}
