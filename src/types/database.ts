@@ -12,6 +12,7 @@ export interface Profile {
   level: FitnessLevel;
   goals: string[];
   usual_slots: { day: string; period: string }[];
+  onboarded: boolean;
   created_at: string;
   updated_at: string;
 }

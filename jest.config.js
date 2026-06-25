@@ -1,7 +1,20 @@
+// Tests de logique pure (node). Bypasse le pipeline Babel React Native
+// (configFile/babelrc: false). Les tests de composants RN (jest-expo + RNTL)
+// seront ajoutés dans un projet Jest dédié quand on testera l'UI.
 module.exports = {
-  preset: 'jest-expo',
-  setupFilesAfterEnv: ['@testing-library/react-native/extend-expect'],
-  transformIgnorePatterns: [
-    'node_modules/(?!((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|nativewind|@supabase/.*))',
-  ],
+  testEnvironment: 'node',
+  transform: {
+    '^.+\\.(ts|tsx|js|jsx)$': [
+      'babel-jest',
+      {
+        babelrc: false,
+        configFile: false,
+        presets: [
+          ['@babel/preset-env', { targets: { node: 'current' } }],
+          '@babel/preset-typescript',
+        ],
+      },
+    ],
+  },
+  testMatch: ['**/__tests__/**/*.test.ts?(x)'],
 };

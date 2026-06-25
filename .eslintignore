@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.expo/
+# Scripts Deno / Node hors application (typés séparément)
+supabase/functions/
+supabase/seed/

@@ -44,7 +44,8 @@ export default function SelectGym() {
       return;
     }
     queryClient.invalidateQueries({ queryKey: ['primary-gym'] });
-    router.back();
+    if (router.canGoBack()) router.back();
+    else router.replace('/(tabs)');
   }
 
   return (

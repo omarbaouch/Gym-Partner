@@ -7,23 +7,44 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { AuthProvider, useAuth } from '@/features/auth/AuthProvider';
+import { useMyProfile } from '@/features/profile/useMyProfile';
+import { registerPushToken } from '@/lib/push';
 import { queryClient } from '@/lib/queryClient';
 
-// Redirige selon l'état d'authentification.
+// Redirige selon l'état d'authentification et d'onboarding.
 function RootNavigation() {
   const { session, loading } = useAuth();
-  const segments = useSegments();
+  const { data: profile, isLoading: profileLoading } = useMyProfile();
+  const segments = useSegments() as string[];
   const router = useRouter();
+
+  const onboarded = profile?.onboarded ?? false;
 
   useEffect(() => {
     if (loading) return;
     const inAuthGroup = segments[0] === '(auth)';
-    if (!session && !inAuthGroup) {
-      router.replace('/(auth)/sign-in');
-    } else if (session && inAuthGroup) {
+    const onOnboarding = segments[1] === 'onboarding';
+
+    if (!session) {
+      if (!inAuthGroup) router.replace('/(auth)/sign-in');
+      return;
+    }
+    // Connecté : on attend le profil avant de décider.
+    if (profileLoading) return;
+
+    if (!onboarded) {
+      if (!onOnboarding) router.replace('/(auth)/onboarding');
+    } else if (inAuthGroup) {
       router.replace('/(tabs)');
     }
-  }, [session, loading, segments, router]);
+  }, [session, loading, profileLoading, onboarded, segments, router]);
+
+  // Enregistre le token de notifications push une fois l'onboarding terminé.
+  useEffect(() => {
+    if (session && onboarded) {
+      registerPushToken(session.user.id).catch(() => {});
+    }
+  }, [session, onboarded]);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
