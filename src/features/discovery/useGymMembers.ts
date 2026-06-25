@@ -9,6 +9,7 @@ export type Member = {
   level: string;
   goals: string[];
   avatar_url: string | null;
+  usual_slots: { day: string; period: string }[];
 };
 
 // Membres qui fréquentent une salle donnée (hors utilisateur courant).
@@ -23,7 +24,9 @@ export function useGymMembers(gymId: string | undefined) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('user_gyms')
-        .select('profiles ( id, display_name, level, goals, avatar_url )')
+        .select(
+          'profiles ( id, display_name, level, goals, avatar_url, usual_slots )',
+        )
         .eq('gym_id', gymId!);
       if (error) throw error;
       return (data ?? [])
