@@ -1,0 +1,54 @@
+name: Build APK (debug, sans compte Expo)
+
+# Construit une APK Android de TEST entièrement sur GitHub Actions :
+#   expo prebuild -> ./gradlew assembleDebug -> APK en artefact téléchargeable.
+# Aucun compte Expo/Apple/Google requis. L'APK debug est auto-signée et
+# installable sur un téléphone Android (sources inconnues à autoriser).
+#
+# Déclenché manuellement (onglet Actions) ou quand ce fichier change.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-apk.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # Clés PUBLIQUES (déjà destinées à être embarquées dans l'app).
+      EXPO_PUBLIC_SUPABASE_URL: https://vmnktijuxunnmjodfbxz.supabase.co
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtbmt0aWp1eHVubm1qb2RmYnh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0MTkwNTEsImV4cCI6MjA5Nzk5NTA1MX0.c9wlgvoyaI9b-uBtpPiYltB_XRZn4HcUGAB2JkJwjO8
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prebuild (génère le projet android/)
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Build de l'APK debug
+        run: ./gradlew assembleDebug --no-daemon
+        working-directory: android
+
+      - name: Publier l'APK en artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gym-partner-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
