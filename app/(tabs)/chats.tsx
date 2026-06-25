@@ -1,27 +1,20 @@
-import { useQuery } from '@tanstack/react-query';
-import { Link } from 'expo-router';
+import { Image } from 'expo-image';
+import { Link, useFocusEffect } from 'expo-router';
+import { useCallback } from 'react';
 import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native';
 
 import { Screen } from '@/components/Screen';
-import { useAuth } from '@/features/auth/AuthProvider';
-import { supabase } from '@/lib/supabase';
+import { useConversations } from '@/features/chat/useConversations';
 
 export default function Chats() {
-  const { session } = useAuth();
-  const me = session?.user.id;
+  const { data, isLoading, refetch } = useConversations();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['conversations', me],
-    enabled: !!me,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('conversations')
-        .select('id, user_a, user_b, last_message_at')
-        .order('last_message_at', { ascending: false, nullsFirst: false });
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
+  // Rafraîchit (compteurs non-lus, dernier message) au retour sur l'onglet.
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
 
   return (
     <Screen>
@@ -30,7 +23,8 @@ export default function Chats() {
       ) : (
         <FlatList
           data={data ?? []}
-          keyExtractor={(c) => c.id}
+          keyExtractor={(c) => c.conversation_id}
+          contentContainerClassName="py-3"
           ItemSeparatorComponent={() => <View className="h-3" />}
           ListEmptyComponent={
             <Text className="mt-10 text-center text-muted">
@@ -38,14 +32,30 @@ export default function Chats() {
             </Text>
           }
           renderItem={({ item }) => (
-            <Link href={{ pathname: '/chat/[id]', params: { id: item.id } }} asChild>
-              <Pressable className="rounded-2xl bg-surface p-4">
-                <Text className="text-white">Conversation</Text>
-                <Text className="text-muted">
-                  {item.last_message_at
-                    ? new Date(item.last_message_at).toLocaleString('fr-FR')
-                    : 'Nouveau'}
-                </Text>
+            <Link
+              href={{ pathname: '/chat/[id]', params: { id: item.conversation_id } }}
+              asChild
+            >
+              <Pressable className="flex-row items-center gap-3 rounded-2xl bg-surface p-3">
+                <Image
+                  source={item.other_avatar ?? undefined}
+                  className="h-12 w-12 rounded-full bg-background"
+                />
+                <View className="flex-1">
+                  <Text className="text-base font-semibold text-white">
+                    {item.other_name}
+                  </Text>
+                  <Text className="text-muted" numberOfLines={1}>
+                    {item.last_message ?? 'Nouvelle conversation'}
+                  </Text>
+                </View>
+                {item.unread_count > 0 && (
+                  <View className="h-6 min-w-6 items-center justify-center rounded-full bg-primary px-2">
+                    <Text className="text-xs font-bold text-white">
+                      {item.unread_count}
+                    </Text>
+                  </View>
+                )}
               </Pressable>
             </Link>
           )}

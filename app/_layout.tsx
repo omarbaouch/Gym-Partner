@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { AuthProvider, useAuth } from '@/features/auth/AuthProvider';
 import { useMyProfile } from '@/features/profile/useMyProfile';
+import { useNotificationNavigation } from '@/lib/notifications';
 import { registerPushToken } from '@/lib/push';
 import { queryClient } from '@/lib/queryClient';
 
@@ -19,6 +20,9 @@ function RootNavigation() {
   const router = useRouter();
 
   const onboarded = profile?.onboarded ?? false;
+
+  // Ouvre la conversation quand l'utilisateur tape sur une notification.
+  useNotificationNavigation();
 
   useEffect(() => {
     if (loading) return;

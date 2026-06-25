@@ -88,8 +88,8 @@ supabase/
 ## Feuille de route
 
 - [x] Phase 0 — Fondations (scaffold, configs, schéma + RLS, squelette d'écrans, CI)
-- [ ] Phase 1 — Auth & profil (onboarding complet, upload avatar)
-- [ ] Phase 2 — Salles & découverte (import OSM, carte + géoloc, filtres)
-- [ ] Phase 3 — Chat & push (Edge Function branchée, notifications)
+- [x] Phase 1 — Auth & profil (onboarding complet, upload avatar)
+- [x] Phase 2 — Salles & découverte (import OSM, carte + géoloc, filtres)
+- [x] Phase 3 — Chat & push (temps réel, accusés de lecture, non-lus, notifications)
 - [ ] Phase 4 — Sécurité & sortie Android (modération, build APK, test interne Play)
 - [ ] Phase 5 — iOS (Sign in with Apple, build & soumission App Store)

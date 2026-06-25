@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { markConversationRead } from '@/features/chat/markRead';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/lib/supabase';
 import type { Message } from '@/types/database';
@@ -32,7 +33,10 @@ export default function Chat() {
       .select('*')
       .eq('conversation_id', conversationId)
       .order('created_at', { ascending: true })
-      .then(({ data }) => setMessages((data as Message[]) ?? []));
+      .then(({ data }) => {
+        setMessages((data as Message[]) ?? []);
+        if (me) markConversationRead(conversationId, me);
+      });
 
     // Temps réel : nouveaux messages de cette conversation.
     const channel = supabase
@@ -46,7 +50,10 @@ export default function Chat() {
           filter: `conversation_id=eq.${conversationId}`,
         },
         (payload) => {
-          setMessages((prev) => [...prev, payload.new as Message]);
+          const msg = payload.new as Message;
+          setMessages((prev) => [...prev, msg]);
+          // Marque lu immédiatement si le message vient de l'interlocuteur.
+          if (me && msg.sender_id !== me) markConversationRead(conversationId, me);
         },
       )
       .subscribe();
@@ -54,7 +61,7 @@ export default function Chat() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [conversationId]);
+  }, [conversationId, me]);
 
   async function send() {
     const content = text.trim();
