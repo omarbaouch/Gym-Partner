@@ -99,4 +99,4 @@ supabase/
 - [x] Phase 2 — Salles & découverte (import OSM, carte + géoloc, filtres)
 - [x] Phase 3 — Chat & push (temps réel, accusés de lecture, non-lus, notifications)
 - [x] Phase 4 — Sécurité & sortie Android (blocage/signalement, suppression RGPD, icônes, build APK)
-- [ ] Phase 5 — iOS (Sign in with Apple, build & soumission App Store)
+- [x] Phase 5 — iOS (Sign in with Apple, config Expo iOS, build & TestFlight)

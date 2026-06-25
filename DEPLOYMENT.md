@@ -13,7 +13,8 @@ Sommaire :
 7. [Suppression de compte (RGPD)](#7-suppression-de-compte-rgpd)
 8. [Build de l'APK (EAS)](#8-build-de-lapk-eas)
 9. [Test interne Google Play](#9-test-interne-google-play)
-10. [Checklist avant production](#10-checklist-avant-production)
+10. [iOS (Sign in with Apple, TestFlight)](#10-ios-sign-in-with-apple--testflight)
+11. [Checklist avant production](#11-checklist-avant-production)
 
 ---
 
@@ -217,7 +218,48 @@ téléphone Android (autorise les sources inconnues) et refais le parcours compl
 
 ---
 
-## 10. Checklist avant production
+## 10. iOS (Sign in with Apple + TestFlight)
+
+La base de code est partagée : **aucune réécriture**. Il faut un **compte Apple
+Developer** (99 $/an) et, pour builder, soit un Mac, soit EAS Build (cloud, sans Mac).
+
+### a. Configurer l'identifiant et la capability
+1. https://developer.apple.com → **Certificates, IDs & Profiles → Identifiers** :
+   crée (ou laisse EAS créer) l'App ID `com.gympartner.app`.
+2. Active la capability **Sign in with Apple** sur cet App ID.
+   > `eas credentials` peut gérer tout ça automatiquement.
+
+### b. Activer le provider Apple côté Supabase
+- Dashboard Supabase → **Authentication → Providers → Apple** : active-le.
+- Renseigne le **Services ID / Bundle ID** (`com.gympartner.app`). Pour le flux natif
+  (celui de l'app), le bundle id suffit ; pour un flux web, ajoute la clé `.p8`,
+  le `Key ID` et le `Team ID` depuis le portail Apple.
+
+> Le code utilise `expo-apple-authentication` (flux natif) +
+> `supabase.auth.signInWithIdToken({ provider: 'apple' })`
+> (`src/features/auth/AppleSignInButton.tsx`). Le bouton ne s'affiche que sur iOS.
+
+### c. Builder et tester
+```bash
+eas build -p ios --profile preview          # build interne (simulateur/ad hoc)
+eas build -p ios --profile production        # build App Store
+```
+EAS demande tes identifiants Apple et génère certificats + provisioning profiles.
+
+### d. TestFlight / App Store
+```bash
+eas submit -p ios                            # envoie le build à App Store Connect
+```
+Puis sur **App Store Connect** : ajoute le build à **TestFlight** (test interne/externe),
+remplis la fiche (confidentialité, captures), et soumets à la revue Apple.
+
+> ⚠️ Apple **exige** Sign in with Apple dès qu'une autre connexion tierce est proposée —
+> c'est déjà intégré. Les notifications push iOS nécessitent une **clé APNs** (gérée
+> automatiquement par EAS lors du build).
+
+---
+
+## 11. Checklist avant production
 
 - [ ] Région Supabase **UE** confirmée, sauvegardes activées.
 - [ ] `Confirm email` **réactivé** dans Supabase Auth.

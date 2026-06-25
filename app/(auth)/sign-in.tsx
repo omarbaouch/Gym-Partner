@@ -4,6 +4,7 @@ import { Alert, Text, TextInput, View } from 'react-native';
 
 import { Button } from '@/components/Button';
 import { Screen } from '@/components/Screen';
+import { AppleSignInButton } from '@/features/auth/AppleSignInButton';
 import { supabase } from '@/lib/supabase';
 
 export default function SignIn() {
@@ -43,6 +44,8 @@ export default function SignIn() {
         />
 
         <Button label="Se connecter" onPress={onSignIn} loading={loading} />
+
+        <AppleSignInButton />
 
         <Link href="/(auth)/sign-up" className="mt-4 text-center text-primary">
           Pas encore de compte ? Crée-en un
