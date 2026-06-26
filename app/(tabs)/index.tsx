@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import { Link, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, Text, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { Button } from '@/components/Button';
 import { Screen } from '@/components/Screen';
@@ -57,7 +58,7 @@ export default function Discover() {
   if (gymLoading) {
     return (
       <Screen>
-        <ActivityIndicator className="mt-10" color="#7C5CFF" />
+        <ActivityIndicator className="mt-10" color="#FF6A1A" />
       </Screen>
     );
   }
@@ -155,7 +156,7 @@ export default function Discover() {
       )}
 
       {isLoading ? (
-        <ActivityIndicator className="mt-10" color="#7C5CFF" />
+        <ActivityIndicator className="mt-10" color="#FF6A1A" />
       ) : (
         <FlatList
           data={filtered}
@@ -168,16 +169,17 @@ export default function Discover() {
                 : "Personne d'autre pour l'instant. Reviens bientôt !"}
             </Text>
           }
-          renderItem={({ item }) => <MemberCard member={item} />}
+          renderItem={({ item, index }) => <MemberCard member={item} index={index} />}
         />
       )}
     </Screen>
   );
 }
 
-function MemberCard({ member }: { member: Member }) {
+function MemberCard({ member, index }: { member: Member; index: number }) {
   const initials = member.display_name.slice(0, 2).toUpperCase();
   return (
+    <Animated.View entering={FadeInDown.duration(350).delay(Math.min(index, 8) * 45)}>
     <Link href={{ pathname: '/member/[id]', params: { id: member.id } }} asChild>
       <Pressable className="flex-row items-center gap-3 rounded-4xl border border-border bg-surface p-4">
         <View className="rounded-full border-2 border-primary/60 p-0.5">
@@ -195,8 +197,8 @@ function MemberCard({ member }: { member: Member }) {
         <View className="flex-1 gap-1">
           <Text className="text-base font-bold text-white">{member.display_name}</Text>
           <View className="flex-row flex-wrap items-center gap-1.5">
-            <View className="rounded-full bg-violet/20 px-2 py-0.5">
-              <Text className="text-xs font-semibold capitalize text-violet">
+            <View className="rounded-full bg-ember/20 px-2 py-0.5">
+              <Text className="text-xs font-semibold capitalize text-ember">
                 {member.level}
               </Text>
             </View>
@@ -210,5 +212,6 @@ function MemberCard({ member }: { member: Member }) {
         <Text className="text-2xl text-muted">›</Text>
       </Pressable>
     </Link>
+    </Animated.View>
   );
 }

@@ -51,7 +51,7 @@ export default function SelectGym() {
   const chainColor = useMemo(() => {
     const m = new Map<string, string>();
     (chains ?? []).forEach((c: { id: string; brand_color: string | null }) =>
-      m.set(c.id, c.brand_color ?? '#C6FF3A'),
+      m.set(c.id, c.brand_color ?? '#FF6A1A'),
     );
     return m;
   }, [chains]);
@@ -189,7 +189,7 @@ export default function SelectGym() {
       )}
 
       {loading ? (
-        <ActivityIndicator className="mt-6" color="#C6FF3A" />
+        <ActivityIndicator className="mt-6" color="#FF6A1A" />
       ) : (
         <FlatList
           data={rows}
@@ -231,7 +231,7 @@ export default function SelectGym() {
                   <Text className="text-base font-bold text-white" numberOfLines={1}>
                     {item.name}
                   </Text>
-                  <Text className="text-xs font-semibold text-violet">
+                  <Text className="text-xs font-semibold text-ember">
                     {item.chain_name ?? 'Salle indépendante'}
                   </Text>
                   <Text className="text-sm text-muted" numberOfLines={1}>
@@ -239,7 +239,7 @@ export default function SelectGym() {
                   </Text>
                 </View>
                 {selecting ? (
-                  <ActivityIndicator color="#C6FF3A" />
+                  <ActivityIndicator color="#FF6A1A" />
                 ) : item.distance_m != null ? (
                   <View className="items-end">
                     <Text className="font-bold text-primary">

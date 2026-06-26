@@ -5,14 +5,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: '#0A0A0F',
-        surface: '#14141C',
-        surfaceHigh: '#1C1C28',
-        border: '#23232F',
-        primary: '#C6FF3A', // volt
-        violet: '#7C3AED',
-        accent: '#C6FF3A',
-        muted: '#8A8A99',
+        background: '#140D0A',
+        surface: '#201610',
+        surfaceHigh: '#2A1E16',
+        border: '#38291E',
+        primary: '#FF6A1A', // orange
+        ember: '#FF2E63', // corail
+        amber: '#FFB627',
+        accent: '#FF6A1A',
+        muted: '#A89388',
         danger: '#FF4D6D',
       },
       borderRadius: {

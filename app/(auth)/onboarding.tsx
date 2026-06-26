@@ -12,7 +12,7 @@ export default function Onboarding() {
   if (isLoading) {
     return (
       <Screen>
-        <ActivityIndicator className="mt-10" color="#7C5CFF" />
+        <ActivityIndicator className="mt-10" color="#FF6A1A" />
       </Screen>
     );
   }

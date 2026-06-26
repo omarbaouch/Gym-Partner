@@ -19,7 +19,7 @@ export default function Chats() {
   return (
     <Screen>
       {isLoading ? (
-        <ActivityIndicator className="mt-10" color="#7C5CFF" />
+        <ActivityIndicator className="mt-10" color="#FF6A1A" />
       ) : (
         <FlatList
           data={data ?? []}

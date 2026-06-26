@@ -1,22 +1,23 @@
-// Identité visuelle "Volt" — néon sportif.
+// Identité visuelle "Ember" — chaude, orange/corail, moderne (sunset).
 // Source unique de vérité : changer ces valeurs (et tailwind.config.js) suffit
 // à re-thématiser toute l'application.
 export const colors = {
-  background: '#0A0A0F',
-  surface: '#14141C',
-  surfaceHigh: '#1C1C28',
-  border: '#23232F',
-  volt: '#C6FF3A',
-  violet: '#7C3AED',
+  background: '#140D0A', // noir chaud
+  surface: '#201610',
+  surfaceHigh: '#2A1E16',
+  border: '#38291E',
+  primary: '#FF6A1A', // orange vif
+  ember: '#FF2E63', // corail / rose chaud
+  amber: '#FFB627',
   text: '#FFFFFF',
-  muted: '#8A8A99',
+  muted: '#A89388',
   danger: '#FF4D6D',
 };
 
-// Dégradés (expo-linear-gradient attend un tableau de couleurs).
+// Dégradés chauds (expo-linear-gradient attend un tableau de couleurs).
 export const gradients = {
-  brand: ['#C6FF3A', '#7C3AED'] as const, // volt -> violet
-  violet: ['#7C3AED', '#4C1D95'] as const,
-  dark: ['#14141C', '#0A0A0F'] as const,
-  glow: ['rgba(124,58,237,0.35)', 'rgba(10,10,15,0)'] as const,
+  brand: ['#FFB02E', '#FF6A1A', '#FF2E63'] as const, // sunset ambre→orange→corail
+  ember: ['#FF6A1A', '#FF2E63'] as const,
+  dark: ['#201610', '#140D0A'] as const,
+  glow: ['rgba(255,106,26,0.30)', 'rgba(20,13,10,0)'] as const,
 };
