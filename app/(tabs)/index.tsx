@@ -1,11 +1,12 @@
 import { Image } from 'expo-image';
 import { Link, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, ScrollView, Text, View } from 'react-native';
+import { FlatList, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { Button } from '@/components/Button';
 import { Screen } from '@/components/Screen';
+import { SkeletonList } from '@/components/Skeleton';
 import {
   emptyFilters,
   filterMembers,
@@ -16,6 +17,7 @@ import { useGymMembers, type Member } from '@/features/discovery/useGymMembers';
 import { chainLogoUrl } from '@/features/gyms/chainLogo';
 import { usePrimaryGym } from '@/features/gyms/usePrimaryGym';
 import { GOALS, LEVELS, PERIODS } from '@/features/profile/constants';
+import { goalColor } from '@/theme/colors';
 
 function Chip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
   return (
@@ -58,7 +60,7 @@ export default function Discover() {
   if (gymLoading) {
     return (
       <Screen>
-        <ActivityIndicator className="mt-10" color="#FF6A1A" />
+        <SkeletonList />
       </Screen>
     );
   }
@@ -156,7 +158,7 @@ export default function Discover() {
       )}
 
       {isLoading ? (
-        <ActivityIndicator className="mt-10" color="#FF6A1A" />
+        <SkeletonList />
       ) : (
         <FlatList
           data={filtered}
@@ -203,8 +205,14 @@ function MemberCard({ member, index }: { member: Member; index: number }) {
               </Text>
             </View>
             {member.goals.slice(0, 2).map((g) => (
-              <View key={g} className="rounded-full bg-primary/15 px-2 py-0.5">
-                <Text className="text-xs font-semibold text-primary">{g}</Text>
+              <View
+                key={g}
+                className="rounded-full px-2 py-0.5"
+                style={{ backgroundColor: `${goalColor(g)}26` }}
+              >
+                <Text className="text-xs font-semibold" style={{ color: goalColor(g) }}>
+                  {g}
+                </Text>
               </View>
             ))}
           </View>

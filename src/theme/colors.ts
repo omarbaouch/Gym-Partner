@@ -21,3 +21,20 @@ export const gradients = {
   dark: ['#201610', '#140D0A'] as const,
   glow: ['rgba(255,106,26,0.30)', 'rgba(20,13,10,0)'] as const,
 };
+
+// Palette joyeuse multi-teintes pour les tags (objectifs, etc.).
+export const accents = [
+  '#FF6A1A', // orange
+  '#FF2E63', // corail
+  '#FFB627', // ambre
+  '#FF4D9D', // rose
+  '#22C7B8', // turquoise chaud
+  '#8B5CF6', // violet doux
+];
+
+// Couleur stable et colorée pour un libellé (même objectif → même couleur).
+export function goalColor(label: string): string {
+  let h = 0;
+  for (let i = 0; i < label.length; i++) h = (h * 31 + label.charCodeAt(i)) >>> 0;
+  return accents[h % accents.length];
+}

@@ -10,9 +10,11 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import MapView, { Marker } from 'react-native-maps';
 
 import { Screen } from '@/components/Screen';
+import { SkeletonList } from '@/components/Skeleton';
 import { chainLogoUrl } from '@/features/gyms/chainLogo';
 import { gymSubtitle, formatDistance } from '@/features/gyms/gymLabel';
 import { useChains } from '@/features/gyms/useChains';
@@ -189,7 +191,7 @@ export default function SelectGym() {
       )}
 
       {loading ? (
-        <ActivityIndicator className="mt-6" color="#FF6A1A" />
+        <SkeletonList count={6} />
       ) : (
         <FlatList
           data={rows}
@@ -203,11 +205,14 @@ export default function SelectGym() {
                 : 'Saisis une ville pour rechercher une salle.'}
             </Text>
           }
-          renderItem={({ item }) => {
+          renderItem={({ item, index }) => {
             const color = item.chain_id ? chainColor.get(item.chain_id) : undefined;
             const logo = chainLogoUrl(item.chain_name);
             const selecting = selectingId === item.id;
             return (
+              <Animated.View
+                entering={FadeInDown.duration(300).delay(Math.min(index, 8) * 35)}
+              >
               <Pressable
                 onPress={() => choose(item.id)}
                 disabled={!!selectingId}
@@ -250,6 +255,7 @@ export default function SelectGym() {
                   <Text className="text-2xl text-muted">›</Text>
                 )}
               </Pressable>
+              </Animated.View>
             );
           }}
         />
