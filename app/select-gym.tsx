@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import {
@@ -12,6 +13,7 @@ import {
 import MapView, { Marker } from 'react-native-maps';
 
 import { Screen } from '@/components/Screen';
+import { chainLogoUrl } from '@/features/gyms/chainLogo';
 import { gymSubtitle, formatDistance } from '@/features/gyms/gymLabel';
 import { useChains } from '@/features/gyms/useChains';
 import { useNearbyGyms, useUserLocation, type NearbyGym } from '@/features/gyms/useNearbyGyms';
@@ -136,13 +138,20 @@ export default function SelectGym() {
           contentContainerClassName="gap-2"
           renderItem={({ item }) => {
             const active = chainId === item.id;
+            const logo = chainLogoUrl(item.id ? item.name : null);
             return (
               <Pressable
                 onPress={() => setChainId(item.id)}
-                className={`rounded-full border px-4 py-2 ${
+                className={`flex-row items-center gap-2 rounded-full border px-3 py-2 ${
                   active ? 'border-primary bg-primary/20' : 'border-border bg-surface'
                 }`}
               >
+                {logo && (
+                  <Image
+                    source={logo}
+                    style={{ width: 18, height: 18, borderRadius: 4 }}
+                  />
+                )}
                 <Text className={active ? 'font-bold text-primary' : 'text-muted'}>
                   {item.name}
                 </Text>
@@ -196,6 +205,7 @@ export default function SelectGym() {
           }
           renderItem={({ item }) => {
             const color = item.chain_id ? chainColor.get(item.chain_id) : undefined;
+            const logo = chainLogoUrl(item.chain_name);
             const selecting = selectingId === item.id;
             return (
               <Pressable
@@ -203,10 +213,20 @@ export default function SelectGym() {
                 disabled={!!selectingId}
                 className="flex-row items-center gap-3 rounded-4xl border border-border bg-surface p-4"
               >
-                <View
-                  className="h-10 w-1.5 rounded-full"
-                  style={{ backgroundColor: color ?? '#3A3A48' }}
-                />
+                {logo ? (
+                  <View className="h-11 w-11 items-center justify-center rounded-2xl bg-white p-1.5">
+                    <Image
+                      source={logo}
+                      style={{ width: '100%', height: '100%' }}
+                      contentFit="contain"
+                    />
+                  </View>
+                ) : (
+                  <View
+                    className="h-11 w-1.5 rounded-full"
+                    style={{ backgroundColor: color ?? '#3A3A48' }}
+                  />
+                )}
                 <View className="flex-1 pr-2">
                   <Text className="text-base font-bold text-white" numberOfLines={1}>
                     {item.name}

@@ -12,6 +12,7 @@ import {
   type MemberFilters,
 } from '@/features/discovery/filters';
 import { useGymMembers, type Member } from '@/features/discovery/useGymMembers';
+import { chainLogoUrl } from '@/features/gyms/chainLogo';
 import { usePrimaryGym } from '@/features/gyms/usePrimaryGym';
 import { GOALS, LEVELS, PERIODS } from '@/features/profile/constants';
 
@@ -77,9 +78,22 @@ export default function Discover() {
   return (
     <Screen>
       <View className="flex-row items-center justify-between py-3">
-        <View>
-          <Text className="text-xl font-bold text-white">{gym.name}</Text>
-          <Text className="text-muted">{gym.city}</Text>
+        <View className="flex-1 flex-row items-center gap-3">
+          {chainLogoUrl(gym.gym_chains?.name) && (
+            <View className="h-11 w-11 items-center justify-center rounded-2xl bg-white p-1.5">
+              <Image
+                source={chainLogoUrl(gym.gym_chains?.name)!}
+                style={{ width: '100%', height: '100%' }}
+                contentFit="contain"
+              />
+            </View>
+          )}
+          <View className="flex-1">
+            <Text className="text-xl font-extrabold text-white" numberOfLines={1}>
+              {gym.name}
+            </Text>
+            <Text className="text-muted">{gym.city}</Text>
+          </View>
         </View>
         <View className="flex-row items-center gap-3">
           <Pressable onPress={() => setShowFilters((v) => !v)}>
