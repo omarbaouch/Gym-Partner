@@ -40,6 +40,14 @@
       "expo-secure-store",
       "expo-apple-authentication",
       [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "1.9.25"
+          }
+        }
+      ],
+      [
         "expo-location",
         {
           "locationWhenInUsePermission": "Gym Partner utilise votre position pour trouver les salles de sport proches de vous."
