@@ -1,4 +1,7 @@
-import { ActivityIndicator, Pressable, Text } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+
+import { gradients } from '@/theme/colors';
 
 type Props = {
   label: string;
@@ -8,6 +11,7 @@ type Props = {
   disabled?: boolean;
 };
 
+// Bouton principal : dégradé volt→violet, coins très arrondis.
 export function Button({
   label,
   onPress,
@@ -16,23 +20,38 @@ export function Button({
   disabled,
 }: Props) {
   const isPrimary = variant === 'primary';
+  const dim = disabled || loading;
+
+  if (!isPrimary) {
+    return (
+      <Pressable
+        onPress={onPress}
+        disabled={dim}
+        className={`h-14 items-center justify-center rounded-4xl border border-border px-5 ${
+          dim ? 'opacity-50' : ''
+        }`}
+      >
+        <Text className="text-base font-semibold text-muted">{label}</Text>
+      </Pressable>
+    );
+  }
+
   return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled || loading}
-      className={`h-12 items-center justify-center rounded-2xl px-5 ${
-        isPrimary ? 'bg-primary' : 'border border-muted'
-      } ${disabled || loading ? 'opacity-50' : ''}`}
-    >
-      {loading ? (
-        <ActivityIndicator color="#fff" />
-      ) : (
-        <Text
-          className={`text-base font-semibold ${isPrimary ? 'text-white' : 'text-muted'}`}
-        >
-          {label}
-        </Text>
-      )}
+    <Pressable onPress={onPress} disabled={dim} className={dim ? 'opacity-60' : ''}>
+      <LinearGradient
+        colors={gradients.brand}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{ borderRadius: 28 }}
+      >
+        <View className="h-14 items-center justify-center px-5">
+          {loading ? (
+            <ActivityIndicator color="#0A0A0F" />
+          ) : (
+            <Text className="text-base font-extrabold text-background">{label}</Text>
+          )}
+        </View>
+      </LinearGradient>
     </Pressable>
   );
 }

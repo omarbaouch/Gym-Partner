@@ -7,8 +7,8 @@ import { deflateSync } from 'node:zlib';
 import { writeFileSync, mkdirSync } from 'node:fs';
 
 const SIZE = 1024;
-const BG = [11, 11, 15]; // #0B0B0F
-const PRIMARY = [124, 92, 255]; // #7C5CFF
+const BG = [10, 10, 15]; // #0A0A0F
+const PRIMARY = [198, 255, 58]; // #C6FF3A (volt)
 
 const crcTable = (() => {
   const t = [];

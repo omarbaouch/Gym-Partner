@@ -91,11 +91,15 @@ export default function Chat() {
             const mine = item.sender_id === me;
             return (
               <View
-                className={`max-w-[80%] rounded-2xl px-3 py-2 ${
-                  mine ? 'self-end bg-primary' : 'self-start bg-surface'
+                className={`max-w-[80%] rounded-3xl px-4 py-2.5 ${
+                  mine
+                    ? 'self-end rounded-br-md bg-primary'
+                    : 'self-start rounded-bl-md border border-border bg-surface'
                 }`}
               >
-                <Text className="text-white">{item.content}</Text>
+                <Text className={mine ? 'font-medium text-background' : 'text-white'}>
+                  {item.content}
+                </Text>
               </View>
             );
           }}

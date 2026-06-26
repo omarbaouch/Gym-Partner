@@ -4,11 +4,19 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerStyle: { backgroundColor: '#0B0B0F' },
+        headerStyle: { backgroundColor: '#0A0A0F' },
         headerTintColor: '#fff',
-        tabBarStyle: { backgroundColor: '#16161D', borderTopColor: '#16161D' },
-        tabBarActiveTintColor: '#7C5CFF',
+        headerShadowVisible: false,
+        tabBarStyle: {
+          backgroundColor: '#14141C',
+          borderTopColor: '#23232F',
+          height: 62,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        tabBarActiveTintColor: '#C6FF3A',
         tabBarInactiveTintColor: '#8A8A99',
+        tabBarLabelStyle: { fontWeight: '700' },
       }}
     >
       <Tabs.Screen name="index" options={{ title: 'Ma salle' }} />

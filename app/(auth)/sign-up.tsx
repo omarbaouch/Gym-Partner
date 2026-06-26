@@ -30,14 +30,14 @@ export default function SignUp() {
         <Text className="mb-6 text-3xl font-bold text-white">Créer un compte</Text>
 
         <TextInput
-          className="h-12 rounded-2xl bg-surface px-4 text-white"
+          className="h-14 rounded-4xl border border-border bg-surface px-5 text-white"
           placeholder="Pseudo"
           placeholderTextColor="#8A8A99"
           value={displayName}
           onChangeText={setDisplayName}
         />
         <TextInput
-          className="h-12 rounded-2xl bg-surface px-4 text-white"
+          className="h-14 rounded-4xl border border-border bg-surface px-5 text-white"
           placeholder="Email"
           placeholderTextColor="#8A8A99"
           autoCapitalize="none"
@@ -46,7 +46,7 @@ export default function SignUp() {
           onChangeText={setEmail}
         />
         <TextInput
-          className="h-12 rounded-2xl bg-surface px-4 text-white"
+          className="h-14 rounded-4xl border border-border bg-surface px-5 text-white"
           placeholder="Mot de passe"
           placeholderTextColor="#8A8A99"
           secureTextEntry

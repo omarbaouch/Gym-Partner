@@ -162,21 +162,38 @@ export default function Discover() {
 }
 
 function MemberCard({ member }: { member: Member }) {
+  const initials = member.display_name.slice(0, 2).toUpperCase();
   return (
     <Link href={{ pathname: '/member/[id]', params: { id: member.id } }} asChild>
-      <Pressable className="flex-row items-center gap-3 rounded-2xl bg-surface p-3">
-        <Image
-          source={member.avatar_url ?? undefined}
-          className="h-12 w-12 rounded-full bg-background"
-        />
-        <View className="flex-1">
-          <Text className="text-base font-semibold text-white">
-            {member.display_name}
-          </Text>
-          <Text className="text-muted">
-            {member.level} · {member.goals.join(', ') || 'Objectifs non renseignés'}
-          </Text>
+      <Pressable className="flex-row items-center gap-3 rounded-4xl border border-border bg-surface p-4">
+        <View className="rounded-full border-2 border-primary/60 p-0.5">
+          {member.avatar_url ? (
+            <Image
+              source={member.avatar_url}
+              className="h-14 w-14 rounded-full bg-background"
+            />
+          ) : (
+            <View className="h-14 w-14 items-center justify-center rounded-full bg-surfaceHigh">
+              <Text className="font-bold text-primary">{initials}</Text>
+            </View>
+          )}
         </View>
+        <View className="flex-1 gap-1">
+          <Text className="text-base font-bold text-white">{member.display_name}</Text>
+          <View className="flex-row flex-wrap items-center gap-1.5">
+            <View className="rounded-full bg-violet/20 px-2 py-0.5">
+              <Text className="text-xs font-semibold capitalize text-violet">
+                {member.level}
+              </Text>
+            </View>
+            {member.goals.slice(0, 2).map((g) => (
+              <View key={g} className="rounded-full bg-primary/15 px-2 py-0.5">
+                <Text className="text-xs font-semibold text-primary">{g}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+        <Text className="text-2xl text-muted">›</Text>
       </Pressable>
     </Link>
   );
