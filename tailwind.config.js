@@ -5,15 +5,17 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: '#140D0A',
-        surface: '#201610',
-        surfaceHigh: '#2A1E16',
-        border: '#38291E',
-        primary: '#FF6A1A', // orange
-        ember: '#FF2E63', // corail
-        amber: '#FFB627',
-        accent: '#FF6A1A',
-        muted: '#A89388',
+        background: '#160E0B',
+        surface: '#231811',
+        surfaceHigh: '#2E2018',
+        border: '#3D2C20',
+        primary: '#FF7A1A', // orange vif
+        ember: '#FF3D77', // rose corail
+        amber: '#FFC53D',
+        mint: '#2DE0C0',
+        violet: '#9B6CFF',
+        accent: '#FF7A1A',
+        muted: '#B5A192',
         danger: '#FF4D6D',
       },
       borderRadius: {

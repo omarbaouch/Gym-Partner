@@ -7,8 +7,8 @@ import { deflateSync } from 'node:zlib';
 import { writeFileSync, mkdirSync } from 'node:fs';
 
 const SIZE = 1024;
-const BG = [20, 13, 10]; // #140D0A (noir chaud)
-const PRIMARY = [255, 106, 26]; // #FF6A1A (orange)
+const BG = [22, 14, 11]; // #160E0B (noir chaud)
+const PRIMARY = [255, 122, 26]; // #FF7A1A (orange vif)
 
 const crcTable = (() => {
   const t = [];

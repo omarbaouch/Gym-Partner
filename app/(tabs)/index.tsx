@@ -70,12 +70,16 @@ export default function Discover() {
     return (
       <Screen>
         <EmptyState
-          emoji="🏋️"
-          title="Choisis ta salle"
-          subtitle="Découvre les membres qui s'entraînent au même endroit que toi."
+          mascot
+          title="Salut, moi c'est Gymo ! 👋"
+          subtitle="Choisis ta salle et je te présente les membres qui s'y entraînent."
         >
           <View className="mt-2 w-full">
-            <Button label="Choisir ma salle" onPress={() => router.push('/select-gym')} />
+            <Button
+              label="Choisir ma salle"
+              icon="location"
+              onPress={() => router.push('/select-gym')}
+            />
           </View>
         </EmptyState>
       </Screen>

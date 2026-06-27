@@ -8,14 +8,18 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-// État vide animé : grand emoji qui "respire" + titre/sous-titre. Optionnel : enfant (CTA).
+import { Mascot } from './Mascot';
+
+// État vide animé : mascotte ou emoji qui "respire" + titre/sous-titre + CTA optionnel.
 export function EmptyState({
   emoji,
+  mascot,
   title,
   subtitle,
   children,
 }: {
-  emoji: string;
+  emoji?: string;
+  mascot?: boolean;
   title: string;
   subtitle?: string;
   children?: React.ReactNode;
@@ -32,9 +36,13 @@ export function EmptyState({
 
   return (
     <View className="flex-1 items-center justify-center gap-3 px-6">
-      <Animated.Text style={style} className="text-7xl">
-        {emoji}
-      </Animated.Text>
+      {mascot ? (
+        <Mascot size={150} />
+      ) : (
+        <Animated.Text style={style} className="text-7xl">
+          {emoji}
+        </Animated.Text>
+      )}
       <Text className="text-center text-xl font-extrabold text-white">{title}</Text>
       {subtitle && <Text className="text-center text-muted">{subtitle}</Text>}
       {children}

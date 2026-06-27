@@ -107,7 +107,7 @@ export default function MemberProfile() {
         ) : null}
       </View>
 
-      <Button label="Contacter" onPress={contact} />
+      <Button label="Contacter" icon="chatbubble-ellipses" onPress={contact} />
 
       <View className="flex-row justify-center gap-6 pt-4">
         <Text className="text-muted" onPress={onReport}>

@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import Animated, {
@@ -14,15 +16,17 @@ type Props = {
   variant?: 'primary' | 'ghost';
   loading?: boolean;
   disabled?: boolean;
+  icon?: keyof typeof Ionicons.glyphMap;
 };
 
-// Bouton principal : dégradé chaud ambre→orange→corail, animation de pression.
+// Bouton principal : dégradé vif, icône optionnelle, animation + haptique au tap.
 export function Button({
   label,
   onPress,
   variant = 'primary',
   loading,
   disabled,
+  icon,
 }: Props) {
   const isPrimary = variant === 'primary';
   const dim = disabled || loading;
@@ -30,7 +34,10 @@ export function Button({
   const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
   const press = {
-    onPressIn: () => (scale.value = withTiming(0.96, { duration: 110 })),
+    onPressIn: () => {
+      scale.value = withTiming(0.96, { duration: 110 });
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    },
     onPressOut: () => (scale.value = withTiming(1, { duration: 140 })),
   };
 
@@ -41,10 +48,11 @@ export function Button({
           onPress={onPress}
           disabled={dim}
           {...press}
-          className={`h-14 items-center justify-center rounded-4xl border border-border px-5 ${
+          className={`h-14 flex-row items-center justify-center gap-2 rounded-4xl border border-border px-5 ${
             dim ? 'opacity-50' : ''
           }`}
         >
+          {icon && <Ionicons name={icon} size={18} color="#B5A192" />}
           <Text className="text-base font-semibold text-muted">{label}</Text>
         </Pressable>
       </Animated.View>
@@ -65,11 +73,14 @@ export function Button({
           end={{ x: 1, y: 1 }}
           style={{ borderRadius: 28 }}
         >
-          <View className="h-14 items-center justify-center px-5">
+          <View className="h-14 flex-row items-center justify-center gap-2 px-5">
             {loading ? (
-              <ActivityIndicator color="#140D0A" />
+              <ActivityIndicator color="#160E0B" />
             ) : (
-              <Text className="text-base font-extrabold text-background">{label}</Text>
+              <>
+                {icon && <Ionicons name={icon} size={20} color="#160E0B" />}
+                <Text className="text-base font-extrabold text-background">{label}</Text>
+              </>
             )}
           </View>
         </LinearGradient>

@@ -1,8 +1,9 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
+import { Mascot } from '@/components/Mascot';
 import { Screen } from '@/components/Screen';
 import { SkeletonList } from '@/components/Skeleton';
 import { ProfileForm } from '@/features/profile/ProfileForm';
@@ -30,12 +31,15 @@ export default function Onboarding() {
           end={{ x: 1, y: 1 }}
           style={{ borderRadius: 28, marginTop: 8, padding: 20 }}
         >
-          <Text className="text-3xl font-extrabold text-background">
-            Bienvenue 👋
-          </Text>
-          <Text className="mt-1 font-semibold text-background/80">
-            Crée ton profil et trouve ton binôme d'entraînement.
-          </Text>
+          <View className="flex-row items-center gap-3">
+            <Mascot size={76} />
+            <View className="flex-1">
+              <Text className="text-3xl font-extrabold text-background">Bienvenue 👋</Text>
+              <Text className="mt-1 font-semibold text-background/80">
+                Crée ton profil, je m'occupe de te trouver un binôme !
+              </Text>
+            </View>
+          </View>
         </LinearGradient>
       </Animated.View>
 

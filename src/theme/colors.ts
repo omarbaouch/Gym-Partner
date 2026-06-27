@@ -1,35 +1,40 @@
-// Identité visuelle "Ember" — chaude, orange/corail, moderne (sunset).
+// Identité visuelle "Ember Pop" — chaude, vive et joyeuse (sunset candy).
 // Source unique de vérité : changer ces valeurs (et tailwind.config.js) suffit
 // à re-thématiser toute l'application.
 export const colors = {
-  background: '#140D0A', // noir chaud
-  surface: '#201610',
-  surfaceHigh: '#2A1E16',
-  border: '#38291E',
-  primary: '#FF6A1A', // orange vif
-  ember: '#FF2E63', // corail / rose chaud
-  amber: '#FFB627',
+  background: '#160E0B', // noir chaud
+  surface: '#231811',
+  surfaceHigh: '#2E2018',
+  border: '#3D2C20',
+  primary: '#FF7A1A', // orange vif
+  ember: '#FF3D77', // rose corail
+  amber: '#FFC53D', // jaune doré
+  mint: '#2DE0C0', // menthe (contraste frais)
+  violet: '#9B6CFF', // violet doux
   text: '#FFFFFF',
-  muted: '#A89388',
+  muted: '#B5A192',
   danger: '#FF4D6D',
 };
 
-// Dégradés chauds (expo-linear-gradient attend un tableau de couleurs).
+// Dégradés vifs (expo-linear-gradient attend un tableau de couleurs).
 export const gradients = {
-  brand: ['#FFB02E', '#FF6A1A', '#FF2E63'] as const, // sunset ambre→orange→corail
-  ember: ['#FF6A1A', '#FF2E63'] as const,
-  dark: ['#201610', '#140D0A'] as const,
-  glow: ['rgba(255,106,26,0.30)', 'rgba(20,13,10,0)'] as const,
+  brand: ['#FFC53D', '#FF7A1A', '#FF3D77'] as const, // jaune→orange→rose
+  ember: ['#FF7A1A', '#FF3D77'] as const,
+  candy: ['#FF3D77', '#9B6CFF'] as const, // rose→violet
+  fresh: ['#2DE0C0', '#FF7A1A'] as const, // menthe→orange
+  dark: ['#231811', '#160E0B'] as const,
+  glow: ['rgba(255,122,26,0.34)', 'rgba(22,14,11,0)'] as const,
 };
 
 // Palette joyeuse multi-teintes pour les tags (objectifs, etc.).
 export const accents = [
-  '#FF6A1A', // orange
-  '#FF2E63', // corail
-  '#FFB627', // ambre
-  '#FF4D9D', // rose
-  '#22C7B8', // turquoise chaud
-  '#8B5CF6', // violet doux
+  '#FF7A1A', // orange
+  '#FF3D77', // rose corail
+  '#FFC53D', // jaune
+  '#FF5FA2', // rose bonbon
+  '#2DE0C0', // menthe
+  '#9B6CFF', // violet
+  '#4EA8FF', // bleu ciel
 ];
 
 // Couleur stable et colorée pour un libellé (même objectif → même couleur).

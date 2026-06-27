@@ -1,13 +1,13 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Text, TextInput, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { Button } from '@/components/Button';
+import { Mascot } from '@/components/Mascot';
 import { Screen } from '@/components/Screen';
 import { AppleSignInButton } from '@/features/auth/AppleSignInButton';
 import { supabase } from '@/lib/supabase';
-import { gradients } from '@/theme/colors';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -24,20 +24,13 @@ export default function SignIn() {
   return (
     <Screen>
       <View className="flex-1 justify-center gap-4">
-        <View className="mb-2 flex-row items-center gap-3">
-          <LinearGradient
-            colors={gradients.brand}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={{ height: 44, width: 44, borderRadius: 14 }}
-          />
-          <Text className="text-4xl font-extrabold tracking-tight text-white">
+        <Animated.View entering={FadeInDown.duration(500)} className="mb-1 items-center">
+          <Mascot size={132} />
+          <Text className="mt-2 text-4xl font-extrabold tracking-tight text-white">
             GYM<Text className="text-primary">PARTNER</Text>
           </Text>
-        </View>
-        <Text className="mb-6 text-lg text-muted">
-          Trouve ton partenaire d'entraînement.
-        </Text>
+          <Text className="text-lg text-muted">Trouve ton binôme d'entraînement 💪</Text>
+        </Animated.View>
 
         <TextInput
           className="h-14 rounded-4xl border border-border bg-surface px-5 text-white"
