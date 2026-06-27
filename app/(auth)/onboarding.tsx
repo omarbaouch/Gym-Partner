@@ -1,9 +1,13 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { ActivityIndicator, Text } from 'react-native';
+import { Text } from 'react-native';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 import { Screen } from '@/components/Screen';
+import { SkeletonList } from '@/components/Skeleton';
 import { ProfileForm } from '@/features/profile/ProfileForm';
 import { useMyProfile } from '@/features/profile/useMyProfile';
+import { gradients } from '@/theme/colors';
 
 export default function Onboarding() {
   const router = useRouter();
@@ -12,21 +16,37 @@ export default function Onboarding() {
   if (isLoading) {
     return (
       <Screen>
-        <ActivityIndicator className="mt-10" color="#FF6A1A" />
+        <SkeletonList count={4} />
       </Screen>
     );
   }
 
   return (
     <Screen>
-      <Text className="pt-4 text-2xl font-bold text-white">Bienvenue 👋</Text>
-      <Text className="text-muted">Complète ton profil pour trouver des partenaires.</Text>
-      <ProfileForm
-        initial={profile}
-        submitLabel="Continuer"
-        markOnboarded
-        onSubmitted={() => router.replace('/(tabs)')}
-      />
+      <Animated.View entering={FadeInDown.duration(450)}>
+        <LinearGradient
+          colors={gradients.brand}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{ borderRadius: 28, marginTop: 8, padding: 20 }}
+        >
+          <Text className="text-3xl font-extrabold text-background">
+            Bienvenue 👋
+          </Text>
+          <Text className="mt-1 font-semibold text-background/80">
+            Crée ton profil et trouve ton binôme d'entraînement.
+          </Text>
+        </LinearGradient>
+      </Animated.View>
+
+      <Animated.View entering={FadeIn.delay(200)} className="flex-1">
+        <ProfileForm
+          initial={profile}
+          submitLabel="Continuer 🚀"
+          markOnboarded
+          onSubmitted={() => router.replace('/(tabs)')}
+        />
+      </Animated.View>
     </Screen>
   );
 }

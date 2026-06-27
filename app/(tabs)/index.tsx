@@ -5,6 +5,7 @@ import { FlatList, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { Button } from '@/components/Button';
+import { EmptyState } from '@/components/EmptyState';
 import { Screen } from '@/components/Screen';
 import { SkeletonList } from '@/components/Skeleton';
 import {
@@ -68,12 +69,15 @@ export default function Discover() {
   if (!gym) {
     return (
       <Screen>
-        <View className="flex-1 items-center justify-center gap-4">
-          <Text className="text-center text-lg text-white">
-            Choisis ta salle pour découvrir les membres qui s'y entraînent.
-          </Text>
-          <Button label="Choisir ma salle" onPress={() => router.push('/select-gym')} />
-        </View>
+        <EmptyState
+          emoji="🏋️"
+          title="Choisis ta salle"
+          subtitle="Découvre les membres qui s'entraînent au même endroit que toi."
+        >
+          <View className="mt-2 w-full">
+            <Button label="Choisir ma salle" onPress={() => router.push('/select-gym')} />
+          </View>
+        </EmptyState>
       </Screen>
     );
   }
@@ -157,6 +161,12 @@ export default function Discover() {
         </View>
       )}
 
+      {!isLoading && (
+        <Text className="pb-2 text-sm font-bold uppercase tracking-wide text-muted">
+          {filtered.length} partenaire{filtered.length > 1 ? 's' : ''} dans ta salle
+        </Text>
+      )}
+
       {isLoading ? (
         <SkeletonList />
       ) : (
@@ -164,12 +174,16 @@ export default function Discover() {
           data={filtered}
           keyExtractor={(m) => m.id}
           ItemSeparatorComponent={() => <View className="h-3" />}
+          showsVerticalScrollIndicator={false}
           ListEmptyComponent={
-            <Text className="mt-10 text-center text-muted">
-              {isFilterActive(filters)
-                ? 'Aucun membre ne correspond à ces filtres.'
-                : "Personne d'autre pour l'instant. Reviens bientôt !"}
-            </Text>
+            <View className="mt-14 items-center gap-2">
+              <Text className="text-6xl">{isFilterActive(filters) ? '🔍' : '👋'}</Text>
+              <Text className="text-center text-muted">
+                {isFilterActive(filters)
+                  ? 'Aucun membre ne correspond à ces filtres.'
+                  : "Personne d'autre pour l'instant.\nInvite tes potes à rejoindre la salle !"}
+              </Text>
+            </View>
           }
           renderItem={({ item, index }) => <MemberCard member={item} index={index} />}
         />

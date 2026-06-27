@@ -20,6 +20,8 @@ jobs:
       # Clés PUBLIQUES (déjà destinées à être embarquées dans l'app).
       EXPO_PUBLIC_SUPABASE_URL: https://vmnktijuxunnmjodfbxz.supabase.co
       EXPO_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtbmt0aWp1eHVubm1qb2RmYnh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0MTkwNTEsImV4cCI6MjA5Nzk5NTA1MX0.c9wlgvoyaI9b-uBtpPiYltB_XRZn4HcUGAB2JkJwjO8
+      # Clé Google Maps (Android) injectée depuis un secret GitHub (jamais commitée).
+      GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
 
     steps:
       - uses: actions/checkout@v4
