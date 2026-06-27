@@ -25,7 +25,7 @@ export default function SignIn() {
     <Screen>
       <View className="flex-1 justify-center gap-4">
         <Animated.View entering={FadeInDown.duration(500)} className="mb-1 items-center">
-          <Mascot size={132} />
+          <Mascot pose="flex" size={138} />
           <Text className="mt-2 text-4xl font-extrabold tracking-tight text-white">
             GYM<Text className="text-primary">PARTNER</Text>
           </Text>

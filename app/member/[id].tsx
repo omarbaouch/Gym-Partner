@@ -1,22 +1,30 @@
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
+import * as Haptics from 'expo-haptics';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { ActivityIndicator, Alert, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Alert, Text, View } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { Button } from '@/components/Button';
+import { Confetti } from '@/components/Confetti';
+import { Mascot } from '@/components/Mascot';
 import { Screen } from '@/components/Screen';
+import { SkeletonList } from '@/components/Skeleton';
 import {
   REPORT_REASONS,
   useBlockUser,
   useReportUser,
 } from '@/features/moderation/useModeration';
 import { supabase } from '@/lib/supabase';
+import { goalColor } from '@/theme/colors';
 
 export default function MemberProfile() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const blockUser = useBlockUser();
   const reportUser = useReportUser();
+  const [celebrating, setCelebrating] = useState(false);
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['profile', id],
@@ -40,7 +48,12 @@ export default function MemberProfile() {
       Alert.alert('Erreur', error?.message ?? 'Impossible de démarrer la conversation.');
       return;
     }
-    router.push({ pathname: '/chat/[id]', params: { id: data as string } });
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    setCelebrating(true);
+    setTimeout(
+      () => router.replace({ pathname: '/chat/[id]', params: { id: data as string } }),
+      1500,
+    );
   }
 
   function onBlock() {
@@ -77,29 +90,49 @@ export default function MemberProfile() {
   if (isLoading || !profile) {
     return (
       <Screen>
-        <ActivityIndicator className="mt-10" color="#FF6A1A" />
+        <SkeletonList count={3} />
       </Screen>
     );
   }
+
+  const initials = profile.display_name.slice(0, 2).toUpperCase();
 
   return (
     <Screen>
       <Stack.Screen options={{ headerShown: true, title: profile.display_name }} />
       <View className="items-center gap-3 py-6">
-        <Image
-          source={profile.avatar_url ?? undefined}
-          className="h-24 w-24 rounded-full bg-surface"
-        />
-        <Text className="text-2xl font-bold text-white">{profile.display_name}</Text>
-        <Text className="text-muted">{profile.level}</Text>
+        <View className="rounded-full border-2 border-primary/60 p-1">
+          {profile.avatar_url ? (
+            <Image
+              source={profile.avatar_url}
+              style={{ height: 104, width: 104, borderRadius: 52 }}
+            />
+          ) : (
+            <View
+              className="items-center justify-center rounded-full bg-surfaceHigh"
+              style={{ height: 104, width: 104 }}
+            >
+              <Text className="text-2xl font-bold text-primary">{initials}</Text>
+            </View>
+          )}
+        </View>
+        <Text className="text-2xl font-extrabold text-white">{profile.display_name}</Text>
+        <View className="rounded-full bg-ember/20 px-3 py-1">
+          <Text className="text-sm font-semibold capitalize text-ember">
+            {profile.level}
+          </Text>
+        </View>
         <View className="flex-row flex-wrap justify-center gap-2">
           {profile.goals?.map((g: string) => (
-            <Text
+            <View
               key={g}
-              className="rounded-full bg-surface px-3 py-1 text-sm text-accent"
+              className="rounded-full px-3 py-1"
+              style={{ backgroundColor: `${goalColor(g)}26` }}
             >
-              {g}
-            </Text>
+              <Text className="text-sm font-semibold" style={{ color: goalColor(g) }}>
+                {g}
+              </Text>
+            </View>
           ))}
         </View>
         {profile.bio ? (
@@ -117,6 +150,28 @@ export default function MemberProfile() {
           Bloquer
         </Text>
       </View>
+
+      {celebrating && (
+        <Animated.View
+          entering={FadeIn.duration(200)}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(11,8,6,0.92)',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 12,
+          }}
+        >
+          <Confetti />
+          <Mascot pose="celebrate" size={180} />
+          <Text className="text-2xl font-extrabold text-white">C'est parti ! 🎉</Text>
+          <Text className="text-muted">On vous met en relation…</Text>
+        </Animated.View>
+      )}
     </Screen>
   );
 }

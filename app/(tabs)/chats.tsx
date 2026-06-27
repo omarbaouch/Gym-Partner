@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { FlatList, Pressable, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
+import { Mascot } from '@/components/Mascot';
 import { Screen } from '@/components/Screen';
 import { SkeletonList } from '@/components/Skeleton';
 import { useConversations } from '@/features/chat/useConversations';
@@ -29,11 +30,13 @@ export default function Chats() {
           keyExtractor={(c) => c.conversation_id}
           ItemSeparatorComponent={() => <View className="h-3" />}
           ListEmptyComponent={
-            <View className="mt-16 items-center gap-2">
-              <Text className="text-5xl">💬</Text>
+            <View className="mt-12 items-center gap-2">
+              <Mascot pose="wink" size={130} />
+              <Text className="text-center text-base font-bold text-white">
+                Pas encore de messages
+              </Text>
               <Text className="text-center text-muted">
-                Aucune conversation pour l'instant.{'\n'}Contacte un membre depuis « Ma
-                salle ».
+                Contacte un membre depuis « Ma salle » pour démarrer une conversation.
               </Text>
             </View>
           }
