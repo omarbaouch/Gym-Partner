@@ -32,7 +32,7 @@ export default function Onboarding() {
           style={{ borderRadius: 28, marginTop: 8, padding: 20 }}
         >
           <View className="flex-row items-center gap-3">
-            <Mascot size={76} />
+            <Mascot pose="wave" size={84} />
             <View className="flex-1">
               <Text className="text-3xl font-extrabold text-background">Bienvenue 👋</Text>
               <Text className="mt-1 font-semibold text-background/80">
