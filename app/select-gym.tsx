@@ -10,8 +10,9 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { Screen } from '@/components/Screen';
 import { SkeletonList } from '@/components/Skeleton';
@@ -21,6 +22,7 @@ import { useChains } from '@/features/gyms/useChains';
 import { useNearbyGyms, useUserLocation, type NearbyGym } from '@/features/gyms/useNearbyGyms';
 import { useSetPrimaryGym } from '@/features/gyms/useSetPrimaryGym';
 import { supabase } from '@/lib/supabase';
+import { darkMapStyle } from '@/theme/mapStyle';
 
 type GymRow = {
   id: string;
@@ -116,16 +118,21 @@ export default function SelectGym() {
             <Pressable
               key={m}
               onPress={() => setMode(m)}
-              className={`flex-1 items-center rounded-4xl py-2.5 ${
+              className={`flex-1 flex-row items-center justify-center gap-1.5 rounded-4xl py-2.5 ${
                 mode === m ? 'bg-primary' : ''
               }`}
             >
+              <Ionicons
+                name={m === 'near' ? 'navigate' : 'search'}
+                size={15}
+                color={mode === m ? '#160E0B' : '#B5A192'}
+              />
               <Text
                 className={
                   mode === m ? 'font-bold text-background' : 'font-semibold text-muted'
                 }
               >
-                {m === 'near' ? '📍 Près de moi' : '🔎 Par ville'}
+                {m === 'near' ? 'Près de moi' : 'Par ville'}
               </Text>
             </Pressable>
           ))}
@@ -176,7 +183,12 @@ export default function SelectGym() {
       {/* Carte des salles proches */}
       {mode === 'near' && region && (
         <View className="mb-3 h-44 overflow-hidden rounded-4xl border border-border">
-          <MapView style={{ flex: 1 }} initialRegion={region}>
+          <MapView
+            provider={PROVIDER_GOOGLE}
+            style={{ flex: 1 }}
+            initialRegion={region}
+            customMapStyle={darkMapStyle}
+          >
             {(nearby ?? []).map((g: NearbyGym) => (
               <Marker
                 key={g.id}
