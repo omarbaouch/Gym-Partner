@@ -7,6 +7,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Pressable, Text, View } from 'react-native';
 import Animated, {
+  FadeInDown,
   interpolate,
   useAnimatedScrollHandler,
   useAnimatedStyle,
@@ -159,7 +160,7 @@ export default function MemberProfile() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingTop: 150, paddingBottom: 40 }}
       >
-        <View className="items-center px-5">
+        <Animated.View entering={FadeInDown.duration(500)} className="items-center px-5">
           {/* Avatar à anneau dégradé */}
           <LinearGradient
             colors={gradients.brand}
@@ -198,11 +199,11 @@ export default function MemberProfile() {
           {profile.bio ? (
             <Text className="mt-4 text-center leading-5 text-white">{profile.bio}</Text>
           ) : null}
-        </View>
+        </Animated.View>
 
         {/* Highlights : objectifs en bulles */}
         {profile.goals?.length ? (
-          <View className="mt-6 px-5">
+          <Animated.View entering={FadeInDown.duration(500).delay(120)} className="mt-6 px-5">
             <Text className="mb-3 font-head text-xs uppercase tracking-widest text-muted">
               Objectifs
             </Text>
@@ -224,11 +225,11 @@ export default function MemberProfile() {
                 </View>
               ))}
             </View>
-          </View>
+          </Animated.View>
         ) : null}
 
         {/* CTA */}
-        <View className="mt-7 px-5">
+        <Animated.View entering={FadeInDown.duration(500).delay(220)} className="mt-7 px-5">
           <Button label="Message" icon="chatbubble-ellipses" onPress={contact} />
           <View className="mt-4 flex-row justify-center gap-8">
             <Pressable onPress={onReport} className="flex-row items-center gap-1.5">
@@ -240,7 +241,7 @@ export default function MemberProfile() {
               <Text className="text-muted">Bloquer</Text>
             </Pressable>
           </View>
-        </View>
+        </Animated.View>
       </Animated.ScrollView>
 
       {celebrating && (

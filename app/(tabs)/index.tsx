@@ -2,10 +2,11 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { FlatList, Pressable, ScrollView, Text, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { Button } from '@/components/Button';
+import { Counter } from '@/components/Counter';
 import { EmptyState } from '@/components/EmptyState';
 import { Screen } from '@/components/Screen';
 import { SkeletonList } from '@/components/Skeleton';
@@ -35,7 +36,7 @@ function Chip({ label, active, onPress }: { label: string; active: boolean; onPr
 export default function Discover() {
   const router = useRouter();
   const { data: gym, isLoading: gymLoading } = usePrimaryGym();
-  const { data: members, isLoading } = useGymMembers(gym?.id);
+  const { data: members, isLoading, refetch, isRefetching } = useGymMembers(gym?.id);
   const [filters, setFilters] = useState<MemberFilters>(emptyFilters);
   const [showFilters, setShowFilters] = useState(false);
 
@@ -167,9 +168,15 @@ export default function Discover() {
       )}
 
       {!isLoading && (
-        <Text className="pb-2 text-sm font-bold uppercase tracking-wide text-muted">
-          {filtered.length} partenaire{filtered.length > 1 ? 's' : ''} dans ta salle
-        </Text>
+        <View className="flex-row items-baseline gap-1.5 pb-2">
+          <Counter
+            value={filtered.length}
+            className="p-0 font-display text-base text-primary"
+          />
+          <Text className="text-sm font-bold uppercase tracking-wide text-muted">
+            partenaire{filtered.length > 1 ? 's' : ''} dans ta salle
+          </Text>
+        </View>
       )}
 
       {isLoading ? (
@@ -180,6 +187,15 @@ export default function Discover() {
           keyExtractor={(m) => m.id}
           ItemSeparatorComponent={() => <View className="h-3" />}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefetching}
+              onRefresh={refetch}
+              tintColor="#FF7A1A"
+              colors={['#FF7A1A']}
+              progressBackgroundColor="#231811"
+            />
+          }
           ListEmptyComponent={
             <View className="mt-14 items-center gap-2">
               <Text className="text-6xl">{isFilterActive(filters) ? '🔍' : '👋'}</Text>
