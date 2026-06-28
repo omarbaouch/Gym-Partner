@@ -12,6 +12,7 @@ import { Dimensions } from 'react-native';
 import {
   Easing,
   useDerivedValue,
+  useReducedMotion,
   useSharedValue,
   withRepeat,
   withTiming,
@@ -33,13 +34,19 @@ function Blob({
   duration: number;
 }) {
   const t = useSharedValue(0);
+  const reduced = useReducedMotion();
   useEffect(() => {
+    // Reduce Motion : halos figés à mi-course (pas de dérive animée).
+    if (reduced) {
+      t.value = 0.5;
+      return;
+    }
     t.value = withRepeat(
       withTiming(1, { duration, easing: Easing.inOut(Easing.ease) }),
       -1,
       true,
     );
-  }, [t, duration]);
+  }, [t, duration, reduced]);
 
   const cx = useDerivedValue(() => from[0] + (to[0] - from[0]) * t.value);
   const cy = useDerivedValue(() => from[1] + (to[1] - from[1]) * t.value);

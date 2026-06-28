@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { TextInput } from 'react-native';
 import Animated, {
   useAnimatedProps,
+  useReducedMotion,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
@@ -17,9 +18,11 @@ export function Counter({
   className?: string;
 }) {
   const v = useSharedValue(0);
+  const reduced = useReducedMotion();
   useEffect(() => {
-    v.value = withTiming(value, { duration: 700 });
-  }, [value, v]);
+    // Reduce Motion : on saute directement à la valeur (pas de comptage animé).
+    v.value = reduced ? value : withTiming(value, { duration: 700 });
+  }, [value, v, reduced]);
 
   const props = useAnimatedProps(
     () => ({ text: String(Math.round(v.value)) }) as object,
