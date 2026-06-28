@@ -30,7 +30,7 @@ export default function Onboarding() {
           end={{ x: 1, y: 1 }}
           style={{ borderRadius: 28, marginTop: 8, padding: 20 }}
         >
-          <Text className="font-display text-3xl text-background">Bienvenue 👋</Text>
+          <Text className="font-display text-3xl text-background">Bienvenue</Text>
           <Text className="mt-1 font-head text-background/80">
             Crée ton profil pour trouver ton binôme d'entraînement.
           </Text>
@@ -40,7 +40,7 @@ export default function Onboarding() {
       <Animated.View entering={FadeIn.delay(200)} className="flex-1">
         <ProfileForm
           initial={profile}
-          submitLabel="Continuer 🚀"
+          submitLabel="Continuer"
           markOnboarded
           onSubmitted={() => router.replace('/(tabs)')}
         />

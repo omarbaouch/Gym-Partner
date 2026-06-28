@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useRouter } from 'expo-router';
@@ -197,8 +198,25 @@ export default function Discover() {
             />
           }
           ListEmptyComponent={
-            <View className="mt-14 items-center gap-2">
-              <Text className="text-6xl">{isFilterActive(filters) ? '🔍' : '👋'}</Text>
+            <View className="mt-14 items-center gap-3">
+              <LinearGradient
+                colors={gradients.brand}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{
+                  height: 72,
+                  width: 72,
+                  borderRadius: 36,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Ionicons
+                  name={isFilterActive(filters) ? 'search' : 'people'}
+                  size={32}
+                  color="#160E0B"
+                />
+              </LinearGradient>
               <Text className="text-center text-muted">
                 {isFilterActive(filters)
                   ? 'Aucun membre ne correspond à ces filtres.'
