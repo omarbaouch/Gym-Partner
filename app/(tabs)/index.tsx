@@ -1,4 +1,5 @@
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { FlatList, Pressable, ScrollView, Text, View } from 'react-native';
@@ -18,7 +19,7 @@ import { useGymMembers, type Member } from '@/features/discovery/useGymMembers';
 import { chainLogoUrl } from '@/features/gyms/chainLogo';
 import { usePrimaryGym } from '@/features/gyms/usePrimaryGym';
 import { GOALS, LEVELS, PERIODS } from '@/features/profile/constants';
-import { goalColor } from '@/theme/colors';
+import { goalColor, gradients } from '@/theme/colors';
 
 function Chip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
   return (
@@ -202,18 +203,26 @@ function MemberCard({ member, index }: { member: Member; index: number }) {
     <Animated.View entering={FadeInDown.duration(350).delay(Math.min(index, 8) * 45)}>
     <Link href={{ pathname: '/member/[id]', params: { id: member.id } }} asChild>
       <Pressable className="flex-row items-center gap-3 rounded-4xl border border-border bg-surface p-4">
-        <View className="rounded-full border-2 border-primary/60 p-0.5">
+        <LinearGradient
+          colors={gradients.brand}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{ padding: 2.5, borderRadius: 32 }}
+        >
           {member.avatar_url ? (
             <Image
               source={member.avatar_url}
-              className="h-14 w-14 rounded-full bg-background"
+              style={{ height: 56, width: 56, borderRadius: 28, borderWidth: 2.5, borderColor: '#160E0B' }}
             />
           ) : (
-            <View className="h-14 w-14 items-center justify-center rounded-full bg-surfaceHigh">
-              <Text className="font-bold text-primary">{initials}</Text>
+            <View
+              className="items-center justify-center rounded-full bg-surfaceHigh"
+              style={{ height: 56, width: 56, borderWidth: 2.5, borderColor: '#160E0B' }}
+            >
+              <Text className="font-head text-primary">{initials}</Text>
             </View>
           )}
-        </View>
+        </LinearGradient>
         <View className="flex-1 gap-1">
           <Text className="text-base font-bold text-white">{member.display_name}</Text>
           <View className="flex-row flex-wrap items-center gap-1.5">

@@ -1,17 +1,21 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Text, View } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
-
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Alert, Pressable, Text, View } from 'react-native';
+import Animated, {
+  interpolate,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/Button';
 import { Confetti } from '@/components/Confetti';
-import { Screen } from '@/components/Screen';
 import { SkeletonList } from '@/components/Skeleton';
 import {
   REPORT_REASONS,
@@ -21,12 +25,35 @@ import {
 import { supabase } from '@/lib/supabase';
 import { goalColor, gradients } from '@/theme/colors';
 
+type Slot = { day: string; period: string };
+
+function Stat({ value, label }: { value: string | number; label: string }) {
+  return (
+    <View className="flex-1 items-center">
+      <Text className="font-display text-2xl text-white">{value}</Text>
+      <Text className="text-xs uppercase tracking-wide text-muted">{label}</Text>
+    </View>
+  );
+}
+
 export default function MemberProfile() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const blockUser = useBlockUser();
   const reportUser = useReportUser();
   const [celebrating, setCelebrating] = useState(false);
+  const scrollY = useSharedValue(0);
+
+  const onScroll = useAnimatedScrollHandler((e) => {
+    scrollY.value = e.contentOffset.y;
+  });
+  const coverStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateY: interpolate(scrollY.value, [-200, 0], [-100, 0], 'clamp') },
+      { scale: interpolate(scrollY.value, [-200, 0], [1.6, 1], 'clamp') },
+    ],
+  }));
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['profile', id],
@@ -34,7 +61,7 @@ export default function MemberProfile() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, display_name, bio, avatar_url, level, goals')
+        .select('id, display_name, bio, avatar_url, level, goals, usual_slots')
         .eq('id', id!)
         .single();
       if (error) throw error;
@@ -91,78 +118,140 @@ export default function MemberProfile() {
 
   if (isLoading || !profile) {
     return (
-      <Screen>
+      <View className="flex-1 bg-background pt-20">
         <SkeletonList count={3} />
-      </Screen>
+      </View>
     );
   }
 
   const initials = profile.display_name.slice(0, 2).toUpperCase();
+  const slots = (profile.usual_slots ?? []) as Slot[];
+  const days = new Set(slots.map((s) => s.day)).size;
 
   return (
-    <Screen>
-      <Stack.Screen options={{ headerShown: true, title: profile.display_name }} />
-      <View className="items-center gap-3 py-6">
-        <View className="rounded-full border-2 border-primary/60 p-1">
-          {profile.avatar_url ? (
-            <Image
-              source={profile.avatar_url}
-              style={{ height: 104, width: 104, borderRadius: 52 }}
-            />
-          ) : (
-            <View
-              className="items-center justify-center rounded-full bg-surfaceHigh"
-              style={{ height: 104, width: 104 }}
-            >
-              <Text className="text-2xl font-bold text-primary">{initials}</Text>
-            </View>
-          )}
-        </View>
-        <Text className="font-display text-2xl text-white">{profile.display_name}</Text>
-        <View className="rounded-full bg-ember/20 px-3 py-1">
-          <Text className="text-sm font-semibold capitalize text-ember">
-            {profile.level}
+    <View className="flex-1 bg-background">
+      <Stack.Screen options={{ headerShown: false }} />
+
+      {/* Cover parallax */}
+      <Animated.View
+        style={[{ position: 'absolute', top: 0, left: 0, right: 0, height: 200 }, coverStyle]}
+      >
+        <LinearGradient
+          colors={gradients.candy}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{ flex: 1 }}
+        />
+      </Animated.View>
+
+      {/* Bouton retour flottant */}
+      <Pressable
+        onPress={() => router.back()}
+        style={{ position: 'absolute', top: insets.top + 6, left: 16, zIndex: 10 }}
+        className="h-10 w-10 items-center justify-center rounded-full bg-black/30"
+      >
+        <Ionicons name="chevron-back" size={22} color="#fff" />
+      </Pressable>
+
+      <Animated.ScrollView
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingTop: 150, paddingBottom: 40 }}
+      >
+        <View className="items-center px-5">
+          {/* Avatar à anneau dégradé */}
+          <LinearGradient
+            colors={gradients.brand}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ padding: 4, borderRadius: 64 }}
+          >
+            {profile.avatar_url ? (
+              <Image
+                source={profile.avatar_url}
+                style={{ height: 112, width: 112, borderRadius: 56, borderWidth: 4, borderColor: '#160E0B' }}
+              />
+            ) : (
+              <View
+                className="items-center justify-center rounded-full bg-surfaceHigh"
+                style={{ height: 112, width: 112, borderWidth: 4, borderColor: '#160E0B' }}
+              >
+                <Text className="font-display text-3xl text-primary">{initials}</Text>
+              </View>
+            )}
+          </LinearGradient>
+
+          <Text className="mt-3 font-display text-2xl text-white">
+            {profile.display_name}
           </Text>
+
+          {/* Stats row */}
+          <View className="mt-4 w-full flex-row items-center rounded-4xl border border-border bg-surface py-4">
+            <Stat value={profile.level} label="Niveau" />
+            <View className="h-8 w-px bg-border" />
+            <Stat value={profile.goals?.length ?? 0} label="Objectifs" />
+            <View className="h-8 w-px bg-border" />
+            <Stat value={`${days}j`} label="Par sem." />
+          </View>
+
+          {profile.bio ? (
+            <Text className="mt-4 text-center leading-5 text-white">{profile.bio}</Text>
+          ) : null}
         </View>
-        <View className="flex-row flex-wrap justify-center gap-2">
-          {profile.goals?.map((g: string) => (
-            <View
-              key={g}
-              className="rounded-full px-3 py-1"
-              style={{ backgroundColor: `${goalColor(g)}26` }}
-            >
-              <Text className="text-sm font-semibold" style={{ color: goalColor(g) }}>
-                {g}
-              </Text>
+
+        {/* Highlights : objectifs en bulles */}
+        {profile.goals?.length ? (
+          <View className="mt-6 px-5">
+            <Text className="mb-3 font-head text-xs uppercase tracking-widest text-muted">
+              Objectifs
+            </Text>
+            <View className="flex-row flex-wrap gap-3">
+              {profile.goals.map((g: string) => (
+                <View key={g} className="items-center" style={{ width: 76 }}>
+                  <LinearGradient
+                    colors={[goalColor(g), `${goalColor(g)}55`]}
+                    style={{ height: 64, width: 64, borderRadius: 24, alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <Ionicons name="flame" size={26} color="#160E0B" />
+                  </LinearGradient>
+                  <Text
+                    numberOfLines={1}
+                    className="mt-1 text-center text-[11px] text-muted"
+                  >
+                    {g}
+                  </Text>
+                </View>
+              ))}
             </View>
-          ))}
-        </View>
-        {profile.bio ? (
-          <Text className="mt-2 text-center text-white">{profile.bio}</Text>
+          </View>
         ) : null}
-      </View>
 
-      <Button label="Contacter" icon="chatbubble-ellipses" onPress={contact} />
-
-      <View className="flex-row justify-center gap-6 pt-4">
-        <Text className="text-muted" onPress={onReport}>
-          Signaler
-        </Text>
-        <Text className="text-muted" onPress={onBlock}>
-          Bloquer
-        </Text>
-      </View>
+        {/* CTA */}
+        <View className="mt-7 px-5">
+          <Button label="Message" icon="chatbubble-ellipses" onPress={contact} />
+          <View className="mt-4 flex-row justify-center gap-8">
+            <Pressable onPress={onReport} className="flex-row items-center gap-1.5">
+              <Ionicons name="flag-outline" size={15} color="#B5A192" />
+              <Text className="text-muted">Signaler</Text>
+            </Pressable>
+            <Pressable onPress={onBlock} className="flex-row items-center gap-1.5">
+              <Ionicons name="ban-outline" size={15} color="#B5A192" />
+              <Text className="text-muted">Bloquer</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Animated.ScrollView>
 
       {celebrating && (
         <Animated.View
-          entering={FadeIn.duration(200)}
           style={{
             position: 'absolute',
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(11,8,6,0.92)',
+            backgroundColor: 'rgba(11,8,6,0.94)',
             alignItems: 'center',
             justifyContent: 'center',
             gap: 12,
@@ -179,19 +268,14 @@ export default function MemberProfile() {
               borderRadius: 56,
               alignItems: 'center',
               justifyContent: 'center',
-              shadowColor: '#FF3D77',
-              shadowOpacity: 0.6,
-              shadowRadius: 28,
-              shadowOffset: { width: 0, height: 12 },
-              elevation: 14,
             }}
           >
             <Ionicons name="checkmark" size={64} color="#160E0B" />
           </LinearGradient>
-          <Text className="mt-2 font-display text-2xl text-white">C'est parti ! 🎉</Text>
+          <Text className="mt-2 font-display text-2xl text-white">C'est parti !</Text>
           <Text className="text-muted">On vous met en relation…</Text>
         </Animated.View>
       )}
-    </Screen>
+    </View>
   );
 }
