@@ -18,6 +18,11 @@ module.exports = {
         muted: '#B5A192',
         danger: '#FF4D6D',
       },
+      fontFamily: {
+        sans: ['Sora_500Medium'],
+        head: ['Sora_700Bold'],
+        display: ['Sora_800ExtraBold'],
+      },
       borderRadius: {
         '4xl': '28px',
       },

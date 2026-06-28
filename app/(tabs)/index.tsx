@@ -70,9 +70,9 @@ export default function Discover() {
     return (
       <Screen>
         <EmptyState
-          mascot
-          title="Salut, moi c'est Gymo ! 👋"
-          subtitle="Choisis ta salle et je te présente les membres qui s'y entraînent."
+          icon="barbell"
+          title="Choisis ta salle"
+          subtitle="Découvre les membres qui s'entraînent au même endroit que toi."
         >
           <View className="mt-2 w-full">
             <Button
@@ -100,7 +100,7 @@ export default function Discover() {
             </View>
           )}
           <View className="flex-1">
-            <Text className="text-xl font-extrabold text-white" numberOfLines={1}>
+            <Text className="font-display text-xl text-white" numberOfLines={1}>
               {gym.name}
             </Text>
             <Text className="text-muted">{gym.city}</Text>

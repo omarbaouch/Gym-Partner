@@ -6,9 +6,11 @@ import { useState } from 'react';
 import { Alert, Text, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+
 import { Button } from '@/components/Button';
 import { Confetti } from '@/components/Confetti';
-import { Mascot } from '@/components/Mascot';
 import { Screen } from '@/components/Screen';
 import { SkeletonList } from '@/components/Skeleton';
 import {
@@ -17,7 +19,7 @@ import {
   useReportUser,
 } from '@/features/moderation/useModeration';
 import { supabase } from '@/lib/supabase';
-import { goalColor } from '@/theme/colors';
+import { goalColor, gradients } from '@/theme/colors';
 
 export default function MemberProfile() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -116,7 +118,7 @@ export default function MemberProfile() {
             </View>
           )}
         </View>
-        <Text className="text-2xl font-extrabold text-white">{profile.display_name}</Text>
+        <Text className="font-display text-2xl text-white">{profile.display_name}</Text>
         <View className="rounded-full bg-ember/20 px-3 py-1">
           <Text className="text-sm font-semibold capitalize text-ember">
             {profile.level}
@@ -167,8 +169,26 @@ export default function MemberProfile() {
           }}
         >
           <Confetti />
-          <Mascot pose="celebrate" size={180} />
-          <Text className="text-2xl font-extrabold text-white">C'est parti ! 🎉</Text>
+          <LinearGradient
+            colors={gradients.brand}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{
+              height: 112,
+              width: 112,
+              borderRadius: 56,
+              alignItems: 'center',
+              justifyContent: 'center',
+              shadowColor: '#FF3D77',
+              shadowOpacity: 0.6,
+              shadowRadius: 28,
+              shadowOffset: { width: 0, height: 12 },
+              elevation: 14,
+            }}
+          >
+            <Ionicons name="checkmark" size={64} color="#160E0B" />
+          </LinearGradient>
+          <Text className="mt-2 font-display text-2xl text-white">C'est parti ! 🎉</Text>
           <Text className="text-muted">On vous met en relation…</Text>
         </Animated.View>
       )}

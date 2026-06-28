@@ -108,7 +108,7 @@ export default function SelectGym() {
   return (
     <Screen>
       <View className="gap-3 py-3">
-        <Text className="text-3xl font-extrabold text-white">Choisis ta salle</Text>
+        <Text className="font-display text-3xl text-white">Choisis ta salle</Text>
 
         {/* Mode : proximité / ville */}
         <View className="flex-row gap-2 rounded-4xl bg-surface p-1">

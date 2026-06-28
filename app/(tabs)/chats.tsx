@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import { FlatList, Pressable, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
-import { Mascot } from '@/components/Mascot';
+import { EmptyState } from '@/components/EmptyState';
 import { Screen } from '@/components/Screen';
 import { SkeletonList } from '@/components/Skeleton';
 import { useConversations } from '@/features/chat/useConversations';
@@ -21,25 +21,20 @@ export default function Chats() {
 
   return (
     <Screen>
-      <Text className="py-3 text-3xl font-extrabold text-white">Messages</Text>
+      <Text className="py-3 font-display text-3xl text-white">Messages</Text>
       {isLoading ? (
         <SkeletonList count={5} />
+      ) : (data ?? []).length === 0 ? (
+        <EmptyState
+          icon="chatbubbles"
+          title="Pas encore de messages"
+          subtitle="Contacte un membre depuis « Ma salle » pour démarrer une conversation."
+        />
       ) : (
         <FlatList
           data={data ?? []}
           keyExtractor={(c) => c.conversation_id}
           ItemSeparatorComponent={() => <View className="h-3" />}
-          ListEmptyComponent={
-            <View className="mt-12 items-center gap-2">
-              <Mascot pose="wink" size={130} />
-              <Text className="text-center text-base font-bold text-white">
-                Pas encore de messages
-              </Text>
-              <Text className="text-center text-muted">
-                Contacte un membre depuis « Ma salle » pour démarrer une conversation.
-              </Text>
-            </View>
-          }
           renderItem={({ item, index }) => (
             <Animated.View entering={FadeInDown.duration(320).delay(Math.min(index, 8) * 40)}>
               <Link

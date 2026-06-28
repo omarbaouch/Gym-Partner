@@ -71,7 +71,14 @@ export function Button({
           colors={gradients.brand}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={{ borderRadius: 28 }}
+          style={{
+            borderRadius: 28,
+            shadowColor: '#FF7A1A',
+            shadowOpacity: 0.45,
+            shadowRadius: 18,
+            shadowOffset: { width: 0, height: 8 },
+            elevation: 8,
+          }}
         >
           <View className="h-14 flex-row items-center justify-center gap-2 px-5">
             {loading ? (
@@ -79,7 +86,7 @@ export function Button({
             ) : (
               <>
                 {icon && <Ionicons name={icon} size={20} color="#160E0B" />}
-                <Text className="text-base font-extrabold text-background">{label}</Text>
+                <Text className="font-display text-base text-background">{label}</Text>
               </>
             )}
           </View>
