@@ -2,7 +2,7 @@
   "expo": {
     "name": "Gym Partner",
     "slug": "gym-partner",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "gympartner",
@@ -26,6 +26,7 @@
     },
     "android": {
       "package": "com.gympartner.app",
+      "versionCode": 23,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#160E0B"
@@ -57,6 +58,14 @@
         "expo-image-picker",
         {
           "photosPermission": "Gym Partner accède à vos photos pour définir votre photo de profil."
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf"
+          ]
         }
       ]
     ],

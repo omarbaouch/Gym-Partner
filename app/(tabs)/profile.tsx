@@ -9,6 +9,9 @@ import { supabase } from '@/lib/supabase';
 // À remplacer par l'URL réelle de la politique de confidentialité.
 const PRIVACY_URL = 'https://gympartner.app/confidentialite';
 
+// Identifiant de version visible (permet de confirmer le build installé).
+const BUILD_LABEL = 'Gym Partner · v0.1.1 (build 23)';
+
 export default function ProfileScreen() {
   const { data: profile, isLoading } = useMyProfile();
 
@@ -64,6 +67,7 @@ export default function ProfileScreen() {
         <Text className="text-center text-muted" onPress={onDeleteAccount}>
           Supprimer mon compte
         </Text>
+        <Text className="mt-1 text-center text-xs text-muted/60">{BUILD_LABEL}</Text>
       </View>
     </Screen>
   );
