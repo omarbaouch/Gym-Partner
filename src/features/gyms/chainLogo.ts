@@ -8,6 +8,7 @@ const DOMAINS: Record<string, string> = {
   "L'Orange Bleue": 'lorangebleue.fr',
   Neoness: 'neoness.fr',
   'Vita Liberté': 'vitaliberte.fr',
+  'One Fitness Club': 'onefitnessclub.fr',
 };
 
 export function chainLogoUrl(name?: string | null, size = 128): string | null {

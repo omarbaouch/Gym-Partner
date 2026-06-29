@@ -1,5 +1,5 @@
 -- ============================================================================
--- Données de DÉMO : membres réalistes pour la salle "Basic-Fit La Vigie".
+-- Données de DÉMO : membres réalistes pour la salle "One Fitness Club".
 -- But : remplir le feed et les profils pour une démo crédible (captures,
 -- évaluation design). Idempotent (ON CONFLICT). À NE PAS utiliser en prod.
 --
@@ -13,12 +13,12 @@ declare
 begin
   select id into gid
   from public.gyms
-  where name ilike '%la vigie%'
+  where name ilike '%one fitness%'
   order by name
   limit 1;
 
   if gid is null then
-    raise exception 'Salle "La Vigie" introuvable : ajuste le filtre de salle.';
+    raise exception 'Salle "One Fitness Club" introuvable : ajuste le filtre de salle.';
   end if;
 
   create temporary table _demo (

@@ -7,5 +7,6 @@ insert into public.gym_chains (name, brand_color) values
   ('Keep Cool',     '#00B0B9'),
   ('L''Orange Bleue', '#FF6A13'),
   ('Neoness',       '#E6007E'),
-  ('Vita Liberté',  '#7AC143')
+  ('Vita Liberté',  '#7AC143'),
+  ('One Fitness Club', '#E4002B')
 on conflict (name) do nothing;
