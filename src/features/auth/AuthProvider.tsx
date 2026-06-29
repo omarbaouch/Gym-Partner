@@ -15,13 +15,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setLoading(false);
-    });
+    // On ne doit JAMAIS rester bloqué sur `loading` : en cas d'échec
+    // (réseau, init Supabase…), on libère quand même la navigation.
+    supabase.auth
+      .getSession()
+      .then(({ data }) => setSession(data.session))
+      .catch(() => setSession(null))
+      .finally(() => setLoading(false));
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
       setSession(next);
+      setLoading(false);
     });
     return () => sub.subscription.unsubscribe();
   }, []);

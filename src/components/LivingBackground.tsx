@@ -60,7 +60,7 @@ function Blob({
 }
 
 // Fond "aurora" vivant : grands halos dégradés flous qui dérivent lentement.
-export function LivingBackground() {
+export default function LivingBackground() {
   return (
     <Canvas style={{ position: 'absolute', top: 0, left: 0, width, height }}>
       <Fill color="#160E0B" />

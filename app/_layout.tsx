@@ -51,6 +51,8 @@ function RootNavigation() {
     const inAuthGroup = segments[0] === '(auth)';
     const onOnboarding = segments[1] === 'onboarding';
 
+    const atRoot = segments.length === 0;
+
     if (!session) {
       if (!inAuthGroup) router.replace('/(auth)/sign-in');
       return;
@@ -59,7 +61,7 @@ function RootNavigation() {
 
     if (!onboarded) {
       if (!onOnboarding) router.replace('/(auth)/onboarding');
-    } else if (inAuthGroup) {
+    } else if (inAuthGroup || atRoot) {
       router.replace('/(tabs)');
     }
   }, [session, loading, profileLoading, onboarded, segments, router]);
