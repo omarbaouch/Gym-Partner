@@ -1,8 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { BlurView } from 'expo-blur';
 import { useEffect } from 'react';
-import { Dimensions, Platform, Pressable, Text, View } from 'react-native';
+import { Dimensions, Pressable, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -85,18 +84,10 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
   const indStyle = useAnimatedStyle(() => ({ transform: [{ translateX: tx.value }] }));
 
   return (
-    <View style={{ paddingBottom: insets.bottom || 8 }} className="pt-2">
-      {/* Matière verre dépoli (glassmorphism) en fond de barre */}
-      <BlurView
-        intensity={40}
-        tint="dark"
-        experimentalBlurMethod={Platform.OS === 'android' ? 'dimezisBlurView' : undefined}
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-      />
-      <View
-        className="absolute left-0 right-0 top-0 bottom-0 border-t border-white/10"
-        style={{ backgroundColor: 'rgba(35,24,17,0.55)' }}
-      />
+    <View
+      style={{ paddingBottom: insets.bottom || 8 }}
+      className="border-t border-border bg-surface pt-2"
+    >
       {/* indicateur glissant */}
       <Animated.View
         style={[
