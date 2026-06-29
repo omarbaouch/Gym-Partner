@@ -8,6 +8,7 @@ import {
   Sora_800ExtraBold,
   useFonts,
 } from '@expo-google-fonts/sora';
+import { Ionicons } from '@expo/vector-icons';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -90,6 +91,9 @@ export default function RootLayout() {
     Sora_600SemiBold,
     Sora_700Bold,
     Sora_800ExtraBold,
+    // Police des icônes : chargée explicitement pour qu'elles s'affichent
+    // de façon fiable en build release (sinon glyphes invisibles).
+    ...Ionicons.font,
   });
 
   // Filet de sécurité : on ne reste jamais bloqué sur le splash si les polices

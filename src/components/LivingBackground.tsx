@@ -54,37 +54,39 @@ function Blob({
 
   return (
     <Circle cx={cx} cy={cy} r={r}>
-      <RadialGradient c={c} r={r} colors={[color, `${color}00`]} />
+      {/* Centre adouci (alpha) : un halo, pas un aplat saturé. */}
+      <RadialGradient c={c} r={r} colors={[`${color}99`, `${color}00`]} />
     </Circle>
   );
 }
 
-// Fond "aurora" vivant : grands halos dégradés flous qui dérivent lentement.
+// Fond vivant : deux halos chauds discrets, concentrés en haut, qui dérivent
+// lentement et se fondent dans un fond profond (le corps de l'écran reste sombre).
 export default function LivingBackground() {
   return (
     <Canvas style={{ position: 'absolute', top: 0, left: 0, width, height }}>
       <Fill color="#160E0B" />
-      <Group>
-        <Blur blur={60} />
+      <Group opacity={0.7}>
+        <Blur blur={80} />
         <Blob
           color="#FF7A1A"
-          from={[width * 0.2, height * 0.18]}
-          to={[width * 0.42, height * 0.3]}
-          r={width * 0.62}
-          duration={9000}
-        />
-        <Blob
-          color="#FF3D77"
-          from={[width * 0.92, height * 0.1]}
-          to={[width * 0.7, height * 0.26]}
-          r={width * 0.55}
+          from={[width * 0.18, height * 0.12]}
+          to={[width * 0.34, height * 0.2]}
+          r={width * 0.5}
           duration={11000}
         />
         <Blob
+          color="#FF3D77"
+          from={[width * 0.92, height * 0.06]}
+          to={[width * 0.74, height * 0.18]}
+          r={width * 0.46}
+          duration={13000}
+        />
+        <Blob
           color="#9B6CFF"
-          from={[width * 0.5, height * 0.06]}
-          to={[width * 0.3, height * 0.02]}
-          r={width * 0.5}
+          from={[width * 0.55, height * -0.02]}
+          to={[width * 0.4, height * 0.02]}
+          r={width * 0.36}
           duration={13000}
         />
       </Group>
