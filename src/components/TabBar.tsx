@@ -41,7 +41,13 @@ function TabItem({
   const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
   return (
-    <Pressable onPress={onPress} className="flex-1 items-center justify-center">
+    <Pressable
+      onPress={onPress}
+      className="flex-1 items-center justify-center"
+      accessibilityRole="tab"
+      accessibilityLabel={badge ? `${label}, ${badge} non lus` : label}
+      accessibilityState={{ selected: focused }}
+    >
       <Animated.View style={style} className="items-center gap-1">
         <View className="h-10 w-16 items-center justify-center">
           <Ionicons

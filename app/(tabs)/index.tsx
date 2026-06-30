@@ -27,6 +27,9 @@ function Chip({ label, active, onPress }: { label: string; active: boolean; onPr
   return (
     <Pressable
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: active }}
       className={`rounded-full px-3 py-1.5 ${active ? 'bg-primary' : 'bg-surface'}`}
     >
       <Text className={active ? 'font-semibold text-white' : 'text-muted'}>{label}</Text>
@@ -236,7 +239,11 @@ function MemberCard({ member, index }: { member: Member; index: number }) {
   return (
     <Animated.View entering={FadeInDown.duration(350).delay(Math.min(index, 8) * 45)}>
     <Link href={{ pathname: '/member/[id]', params: { id: member.id } }} asChild>
-      <Pressable className="flex-row items-center gap-3 rounded-4xl border border-border bg-surface p-4">
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${member.display_name}, niveau ${member.level}`}
+        className="flex-row items-center gap-3 rounded-4xl border border-border bg-surface p-4"
+      >
         <LinearGradient
           colors={gradients.brand}
           start={{ x: 0, y: 0 }}

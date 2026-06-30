@@ -118,6 +118,9 @@ export default function SelectGym() {
             <Pressable
               key={m}
               onPress={() => setMode(m)}
+              accessibilityRole="button"
+              accessibilityLabel={m === 'near' ? 'Près de moi' : 'Par ville'}
+              accessibilityState={{ selected: mode === m }}
               className={`flex-1 flex-row items-center justify-center gap-1.5 rounded-4xl py-2.5 ${
                 mode === m ? 'bg-primary' : ''
               }`}
@@ -151,6 +154,9 @@ export default function SelectGym() {
             return (
               <Pressable
                 onPress={() => setChainId(item.id)}
+                accessibilityRole="button"
+                accessibilityLabel={item.name}
+                accessibilityState={{ selected: active }}
                 className={`flex-row items-center gap-2 rounded-full border px-3 py-2 ${
                   active ? 'border-primary bg-primary/20' : 'border-border bg-surface'
                 }`}
@@ -176,6 +182,7 @@ export default function SelectGym() {
             placeholderTextColor="#8A8A99"
             value={city}
             onChangeText={setCity}
+            accessibilityLabel="Ville"
           />
         )}
       </View>
@@ -231,6 +238,8 @@ export default function SelectGym() {
               <Pressable
                 onPress={() => choose(item.id)}
                 disabled={!!selectingId}
+                accessibilityRole="button"
+                accessibilityLabel={`${item.name}, ${item.chain_name ?? 'salle indépendante'}`}
                 className="flex-row items-center gap-3 rounded-4xl border border-border bg-surface p-4"
               >
                 {logo ? (

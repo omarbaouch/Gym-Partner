@@ -47,6 +47,9 @@ export function Button({
         <Pressable
           onPress={onPress}
           disabled={dim}
+          accessibilityRole="button"
+          accessibilityLabel={label}
+          accessibilityState={{ disabled: dim, busy: loading }}
           {...press}
           className={`h-14 flex-row items-center justify-center gap-2 rounded-4xl border border-border px-5 ${
             dim ? 'opacity-50' : ''
@@ -64,6 +67,9 @@ export function Button({
       <Pressable
         onPress={onPress}
         disabled={dim}
+        accessibilityRole="button"
+        accessibilityLabel={label}
+        accessibilityState={{ disabled: dim, busy: loading }}
         {...press}
         className={dim ? 'opacity-60' : ''}
       >

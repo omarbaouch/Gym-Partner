@@ -1,4 +1,5 @@
-import { ActivityIndicator, Alert, Linking, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { ActivityIndicator, Alert, Text, View } from 'react-native';
 
 import { Button } from '@/components/Button';
 import { Screen } from '@/components/Screen';
@@ -6,13 +7,11 @@ import { ProfileForm } from '@/features/profile/ProfileForm';
 import { useMyProfile } from '@/features/profile/useMyProfile';
 import { supabase } from '@/lib/supabase';
 
-// À remplacer par l'URL réelle de la politique de confidentialité.
-const PRIVACY_URL = 'https://gympartner.app/confidentialite';
-
 // Identifiant de version visible (permet de confirmer le build installé).
 const BUILD_LABEL = 'Gym Partner · v0.1.1 (build 23)';
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const { data: profile, isLoading } = useMyProfile();
 
   function onDeleteAccount() {
@@ -55,7 +54,8 @@ export default function ProfileScreen() {
       <View className="gap-3 pb-6">
         <Text
           className="text-center text-muted"
-          onPress={() => Linking.openURL(PRIVACY_URL)}
+          onPress={() => router.push('/privacy')}
+          accessibilityRole="link"
         >
           Politique de confidentialité
         </Text>

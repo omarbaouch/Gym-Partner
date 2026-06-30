@@ -78,6 +78,7 @@ function RootNavigation() {
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="select-gym" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="privacy" options={{ presentation: 'modal' }} />
       <Stack.Screen name="member/[id]" options={{ animation: 'slide_from_right' }} />
       <Stack.Screen name="chat/[id]" options={{ animation: 'slide_from_right' }} />
     </Stack>

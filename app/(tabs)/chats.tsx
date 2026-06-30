@@ -41,7 +41,15 @@ export default function Chats() {
                 href={{ pathname: '/chat/[id]', params: { id: item.conversation_id } }}
                 asChild
               >
-                <Pressable className="flex-row items-center gap-3 rounded-4xl border border-border bg-surface p-3.5">
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={
+                    item.unread_count > 0
+                      ? `Conversation avec ${item.other_name}, ${item.unread_count} non lus`
+                      : `Conversation avec ${item.other_name}`
+                  }
+                  className="flex-row items-center gap-3 rounded-4xl border border-border bg-surface p-3.5"
+                >
                   {item.other_avatar ? (
                     <Image
                       source={item.other_avatar}

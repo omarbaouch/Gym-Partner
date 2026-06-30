@@ -99,6 +99,8 @@ export default function Chat() {
       <View className="flex-row items-center gap-3 py-3">
         <Pressable
           onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Retour"
           className="h-10 w-10 items-center justify-center rounded-full bg-surface"
         >
           <Ionicons name="chevron-back" size={22} color="#fff" />
@@ -159,10 +161,14 @@ export default function Chat() {
             value={text}
             onChangeText={setText}
             onSubmitEditing={send}
+            accessibilityLabel="Message"
           />
           <Pressable
             onPress={send}
             disabled={!text.trim()}
+            accessibilityRole="button"
+            accessibilityLabel="Envoyer le message"
+            accessibilityState={{ disabled: !text.trim() }}
             className={`h-14 w-14 items-center justify-center rounded-4xl bg-primary ${
               !text.trim() ? 'opacity-50' : ''
             }`}
