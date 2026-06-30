@@ -182,7 +182,10 @@ export default function SelectGym() {
 
       {/* Carte des salles proches */}
       {mode === 'near' && region && (
-        <View className="mb-3 h-44 overflow-hidden rounded-4xl border border-border">
+        <View
+          collapsable={false}
+          className="mb-3 h-44 overflow-hidden rounded-4xl border border-border"
+        >
           <MapView
             provider={PROVIDER_GOOGLE}
             style={{ flex: 1 }}
