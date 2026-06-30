@@ -18,6 +18,8 @@ import {
   withTiming,
 } from 'react-native-reanimated';
 
+import { getTimeOfDayColors } from '@/theme/colors';
+
 const { width, height } = Dimensions.get('window');
 
 function Blob({
@@ -62,28 +64,31 @@ function Blob({
 
 // Fond vivant : deux halos chauds discrets, concentrés en haut, qui dérivent
 // lentement et se fondent dans un fond profond (le corps de l'écran reste sombre).
+// Les couleurs varient selon le moment de la journée (cf. getTimeOfDayColors).
 export default function LivingBackground() {
+  const [blob1Color, blob2Color, blob3Color] = getTimeOfDayColors();
+
   return (
     <Canvas style={{ position: 'absolute', top: 0, left: 0, width, height }}>
       <Fill color="#160E0B" />
       <Group opacity={0.7}>
         <Blur blur={80} />
         <Blob
-          color="#FF7A1A"
+          color={blob1Color}
           from={[width * 0.18, height * 0.12]}
           to={[width * 0.34, height * 0.2]}
           r={width * 0.5}
           duration={11000}
         />
         <Blob
-          color="#FF3D77"
+          color={blob2Color}
           from={[width * 0.92, height * 0.06]}
           to={[width * 0.74, height * 0.18]}
           r={width * 0.46}
           duration={13000}
         />
         <Blob
-          color="#9B6CFF"
+          color={blob3Color}
           from={[width * 0.55, height * -0.02]}
           to={[width * 0.4, height * 0.02]}
           r={width * 0.36}

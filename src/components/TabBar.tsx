@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { BlurView } from 'expo-blur';
 import { useEffect } from 'react';
 import { Dimensions, Pressable, Text, View } from 'react-native';
 import Animated, {
@@ -57,7 +58,7 @@ function TabItem({
           />
           {!!badge && badge > 0 && (
             <View className="absolute right-3 top-0 h-5 min-w-5 items-center justify-center rounded-full border-2 border-surface bg-ember px-1">
-              <Text className="text-[10px] font-bold text-white">
+              <Text className="text-[10px] font-bold text-background">
                 {badge > 9 ? '9+' : badge}
               </Text>
             </View>
@@ -90,9 +91,11 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
   const indStyle = useAnimatedStyle(() => ({ transform: [{ translateX: tx.value }] }));
 
   return (
-    <View
+    <BlurView
+      intensity={50}
+      tint="dark"
       style={{ paddingBottom: insets.bottom || 8 }}
-      className="border-t border-border bg-surface pt-2"
+      className="border-t border-border pt-2"
     >
       {/* indicateur glissant */}
       <Animated.View
@@ -133,6 +136,6 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
           );
         })}
       </View>
-    </View>
+    </BlurView>
   );
 }

@@ -76,7 +76,7 @@ export default function Chats() {
                   </View>
                   {item.unread_count > 0 && (
                     <View className="h-6 min-w-6 items-center justify-center rounded-full bg-ember px-2">
-                      <Text className="text-xs font-bold text-white">
+                      <Text className="text-xs font-bold text-background">
                         {item.unread_count}
                       </Text>
                     </View>

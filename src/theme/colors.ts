@@ -43,3 +43,14 @@ export function goalColor(label: string): string {
   for (let i = 0; i < label.length; i++) h = (h * 31 + label.charCodeAt(i)) >>> 0;
   return accents[h % accents.length];
 }
+
+// 3 couleurs de halo (Blob 1/2/3 de LivingBackground) selon le moment de la
+// journée — réutilise uniquement les teintes existantes, aucune couleur nouvelle.
+export type TimeOfDayColors = readonly [string, string, string];
+
+export function getTimeOfDayColors(date: Date = new Date()): TimeOfDayColors {
+  const hour = date.getHours();
+  if (hour >= 5 && hour < 11) return [colors.amber, colors.primary, colors.ember] as const; // matin
+  if (hour >= 11 && hour < 18) return [colors.primary, colors.ember, colors.violet] as const; // jour
+  return [colors.ember, colors.violet, colors.violet] as const; // soir/nuit
+}
