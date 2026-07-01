@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { BlurView } from 'expo-blur';
 import { useEffect } from 'react';
 import { Dimensions, Pressable, Text, View } from 'react-native';
 import Animated, {
@@ -91,11 +90,9 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
   const indStyle = useAnimatedStyle(() => ({ transform: [{ translateX: tx.value }] }));
 
   return (
-    <BlurView
-      intensity={50}
-      tint="dark"
+    <View
       style={{ paddingBottom: insets.bottom || 8 }}
-      className="border-t border-border pt-2"
+      className="border-t border-border bg-surface/85 pt-2"
     >
       {/* indicateur glissant */}
       <Animated.View
@@ -136,6 +133,6 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
           );
         })}
       </View>
-    </BlurView>
+    </View>
   );
 }
