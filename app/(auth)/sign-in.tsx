@@ -73,6 +73,7 @@ export default function SignIn() {
           onChangeText={setEmail}
           onFocus={() => setFocus('email')}
           onBlur={() => setFocus(null)}
+          accessibilityLabel="Email"
         />
         <TextInput
           className={field('pw')}
@@ -83,6 +84,7 @@ export default function SignIn() {
           onChangeText={setPassword}
           onFocus={() => setFocus('pw')}
           onBlur={() => setFocus(null)}
+          accessibilityLabel="Mot de passe"
         />
 
         <View className="mt-2">
