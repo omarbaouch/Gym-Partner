@@ -1,9 +1,12 @@
 # Gym Partner 🏋️
 
-Application mobile pour **trouver des partenaires d'entraînement** dans sa salle de
-sport. On choisit sa chaîne (Basic-Fit, Fitness Park, On Air…) puis sa salle, on voit
-les autres membres qui s'y entraînent, et on les contacte par messagerie pour organiser
-des séances. Marché initial : **France**.
+**Ta salle, en direct.**
+
+Application mobile qui montre **qui s'entraîne dans ta salle, maintenant** — et ce
+qu'il vient bosser. On se signale présent (« Je suis à la salle · Jambes · 2 h »),
+on voit le tableau vivant des membres présents, et si l'envie de s'entraîner
+ensemble est **réciproque** (match), le chat s'ouvre pour organiser la séance.
+Marché initial : **France**.
 
 > **Android (APK) d'abord, iOS ensuite** — même base de code grâce à React Native / Expo.
 

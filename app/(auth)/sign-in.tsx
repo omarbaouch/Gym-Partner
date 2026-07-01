@@ -57,9 +57,7 @@ export default function SignIn() {
             <Text className="font-display text-4xl tracking-tight text-white">
               GYM<Text className="text-primary">PARTNER</Text>
             </Text>
-            <Text className="mt-1 text-base text-muted">
-              Trouve ton binôme d'entraînement
-            </Text>
+            <Text className="mt-1 text-base text-muted">Ta salle, en direct.</Text>
           </View>
         </Animated.View>
 
