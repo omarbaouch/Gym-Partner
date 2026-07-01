@@ -1,7 +1,7 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { ActivityIndicator, Alert, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native';
 
-import { Button } from '@/components/Button';
 import { Screen } from '@/components/Screen';
 import { ProfileForm } from '@/features/profile/ProfileForm';
 import { useMyProfile } from '@/features/profile/useMyProfile';
@@ -9,6 +9,33 @@ import { supabase } from '@/lib/supabase';
 
 // Identifiant de version visible (permet de confirmer le build installé).
 const BUILD_LABEL = 'Gym Partner · v0.1.1 (build 23)';
+
+function ActionRow({
+  icon,
+  label,
+  danger,
+  onPress,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  danger?: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      className="flex-row items-center gap-3 px-4 py-3.5"
+    >
+      <Ionicons name={icon} size={18} color={danger ? '#FF4D6D' : '#B5A192'} />
+      <Text className={`flex-1 font-semibold ${danger ? 'text-danger' : 'text-white'}`}>
+        {label}
+      </Text>
+      <Ionicons name="chevron-forward" size={16} color="#B5A192" />
+    </Pressable>
+  );
+}
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -46,28 +73,34 @@ export default function ProfileScreen() {
 
   return (
     <Screen>
+      <Text className="py-3 font-display text-3xl text-white">Ton profil</Text>
       <ProfileForm
         initial={profile}
         submitLabel="Enregistrer"
         onSubmitted={() => Alert.alert('Enregistré', 'Profil mis à jour.')}
       />
-      <View className="gap-3 pb-6">
-        <Text
-          className="text-center text-muted"
-          onPress={() => router.push('/privacy')}
-          accessibilityRole="link"
-        >
-          Politique de confidentialité
-        </Text>
-        <Button
-          label="Se déconnecter"
-          variant="ghost"
-          onPress={() => supabase.auth.signOut()}
-        />
-        <Text className="text-center text-muted" onPress={onDeleteAccount}>
-          Supprimer mon compte
-        </Text>
-        <Text className="mt-1 text-center text-xs text-muted/60">{BUILD_LABEL}</Text>
+      <View className="gap-4 pb-6">
+        <View className="overflow-hidden rounded-4xl border border-border bg-surface">
+          <ActionRow
+            icon="shield-checkmark-outline"
+            label="Politique de confidentialité"
+            onPress={() => router.push('/privacy')}
+          />
+          <View className="h-px bg-border" />
+          <ActionRow
+            icon="log-out-outline"
+            label="Se déconnecter"
+            onPress={() => supabase.auth.signOut()}
+          />
+          <View className="h-px bg-border" />
+          <ActionRow
+            icon="trash-outline"
+            label="Supprimer mon compte"
+            danger
+            onPress={onDeleteAccount}
+          />
+        </View>
+        <Text className="text-center text-xs text-muted/60">{BUILD_LABEL}</Text>
       </View>
     </Screen>
   );

@@ -1,10 +1,13 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 
 import { Button } from '@/components/Button';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { pickAndUploadAvatar } from '@/lib/avatar';
+import { gradients } from '@/theme/colors';
 import type { FitnessLevel, Profile } from '@/types/database';
 
 import { DAYS, GOALS, LEVELS, PERIODS } from './constants';
@@ -24,6 +27,9 @@ function Chip({
   return (
     <Pressable
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: active }}
       className={`rounded-full px-4 py-2 ${active ? 'bg-primary' : 'bg-surface'}`}
     >
       <Text className={active ? 'font-semibold text-white' : 'text-muted'}>{label}</Text>
@@ -108,14 +114,42 @@ export function ProfileForm({
   return (
     <ScrollView contentContainerClassName="gap-5 py-4">
       <View className="items-center gap-2">
-        <Pressable onPress={onPickAvatar}>
-          <Image
-            source={avatarUrl ?? undefined}
-            className="h-24 w-24 rounded-full bg-surface"
-          />
+        <Pressable
+          onPress={onPickAvatar}
+          disabled={uploading}
+          accessibilityRole="button"
+          accessibilityLabel="Changer la photo de profil"
+        >
+          <LinearGradient
+            colors={gradients.brand}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ padding: 4, borderRadius: 56 }}
+          >
+            <Image
+              source={avatarUrl ?? undefined}
+              style={{
+                height: 104,
+                width: 104,
+                borderRadius: 52,
+                borderWidth: 4,
+                borderColor: '#160E0B',
+                backgroundColor: '#231811',
+              }}
+            />
+          </LinearGradient>
+          <View
+            className="absolute bottom-0 right-0 h-9 w-9 items-center justify-center rounded-full border-2 border-background bg-primary"
+          >
+            {uploading ? (
+              <ActivityIndicator size="small" color="#160E0B" />
+            ) : (
+              <Ionicons name="camera" size={16} color="#160E0B" />
+            )}
+          </View>
         </Pressable>
-        <Text className="text-primary" onPress={onPickAvatar}>
-          {uploading ? 'Envoi...' : 'Choisir une photo'}
+        <Text className="text-sm text-muted">
+          {uploading ? 'Envoi...' : 'Changer la photo'}
         </Text>
       </View>
 
