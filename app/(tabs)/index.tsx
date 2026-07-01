@@ -7,6 +7,7 @@ import { FlatList, Pressable, RefreshControl, ScrollView, Text, View } from 'rea
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { Button } from '@/components/Button';
+import { Chip } from '@/components/Chip';
 import { Counter } from '@/components/Counter';
 import { EmptyState } from '@/components/EmptyState';
 import { Screen } from '@/components/Screen';
@@ -20,22 +21,9 @@ import {
 import { useGymMembers, type Member } from '@/features/discovery/useGymMembers';
 import { chainLogoUrl } from '@/features/gyms/chainLogo';
 import { usePrimaryGym } from '@/features/gyms/usePrimaryGym';
+import { LiveSection } from '@/features/presence/LiveSection';
 import { GOALS, LEVELS, PERIODS } from '@/features/profile/constants';
 import { goalColor, gradients } from '@/theme/colors';
-
-function Chip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      accessibilityState={{ selected: active }}
-      className={`rounded-full px-3 py-1.5 ${active ? 'bg-primary' : 'bg-surface'}`}
-    >
-      <Text className={active ? 'font-semibold text-white' : 'text-muted'}>{label}</Text>
-    </Pressable>
-  );
-}
 
 export default function Discover() {
   const router = useRouter();
@@ -171,18 +159,6 @@ export default function Discover() {
         </View>
       )}
 
-      {!isLoading && (
-        <View className="flex-row items-baseline gap-1.5 pb-2">
-          <Counter
-            value={filtered.length}
-            className="p-0 font-display text-base text-primary"
-          />
-          <Text className="text-sm font-bold uppercase tracking-wide text-muted">
-            partenaire{filtered.length > 1 ? 's' : ''} dans ta salle
-          </Text>
-        </View>
-      )}
-
       {isLoading ? (
         <SkeletonList />
       ) : (
@@ -191,6 +167,24 @@ export default function Discover() {
           keyExtractor={(m) => m.id}
           ItemSeparatorComponent={() => <View className="h-3" />}
           showsVerticalScrollIndicator={false}
+          ListHeaderComponent={
+            <View className="gap-3 pb-3">
+              {/* « Le Live » : le cœur de l'app — qui est là, maintenant. */}
+              <LiveSection gymId={gym.id} />
+              <View className="mt-1 flex-row items-baseline gap-1.5">
+                <Text className="font-head text-xs uppercase tracking-widest text-muted">
+                  Aussi inscrits ici
+                </Text>
+                <Counter
+                  value={filtered.length}
+                  className="p-0 font-display text-base text-primary"
+                />
+                <Text className="text-xs font-bold text-muted">
+                  membre{filtered.length > 1 ? 's' : ''}
+                </Text>
+              </View>
+            </View>
+          }
           refreshControl={
             <RefreshControl
               refreshing={isRefetching}
