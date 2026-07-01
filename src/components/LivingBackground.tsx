@@ -18,7 +18,7 @@ import {
   withTiming,
 } from 'react-native-reanimated';
 
-import { getTimeOfDayColors } from '@/theme/colors';
+import { colors, getTimeOfDayColors } from '@/theme/colors';
 
 const { width, height } = Dimensions.get('window');
 
@@ -70,7 +70,7 @@ export default function LivingBackground() {
 
   return (
     <Canvas style={{ position: 'absolute', top: 0, left: 0, width, height }}>
-      <Fill color="#160E0B" />
+      <Fill color={colors.background} />
       <Group opacity={0.7}>
         <Blur blur={80} />
         <Blob

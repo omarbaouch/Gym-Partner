@@ -1,13 +1,11 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 import { Screen } from '@/components/Screen';
 import { SkeletonList } from '@/components/Skeleton';
 import { ProfileForm } from '@/features/profile/ProfileForm';
 import { useMyProfile } from '@/features/profile/useMyProfile';
-import { gradients } from '@/theme/colors';
 
 export default function Onboarding() {
   const router = useRouter();
@@ -24,17 +22,14 @@ export default function Onboarding() {
   return (
     <Screen>
       <Animated.View entering={FadeInDown.duration(450)}>
-        <LinearGradient
-          colors={gradients.brand}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={{ borderRadius: 28, marginTop: 8, padding: 20 }}
-        >
-          <Text className="font-display text-3xl text-background">Bienvenue</Text>
-          <Text className="mt-1 font-head text-background/80">
-            Crée ton profil pour trouver ton binôme d'entraînement.
+        <View className="mt-2 rounded-4xl border border-border bg-surfaceHigh p-5">
+          <Text className="font-display text-3xl text-white">
+            Bienvenue<Text className="text-primary">.</Text>
           </Text>
-        </LinearGradient>
+          <Text className="mt-1 font-head text-muted">
+            Crée ton profil — ta salle t'attend, en direct.
+          </Text>
+        </View>
       </Animated.View>
 
       <Animated.View entering={FadeIn.delay(200)} className="flex-1">

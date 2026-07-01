@@ -25,7 +25,7 @@ import {
   useReportUser,
 } from '@/features/moderation/useModeration';
 import { supabase } from '@/lib/supabase';
-import { goalColor, gradients } from '@/theme/colors';
+import { colors, goalColor, gradients } from '@/theme/colors';
 
 type Slot = { day: string; period: string };
 
@@ -33,7 +33,7 @@ function Stat({ value, label }: { value: string | number; label: string }) {
   return (
     <View className="flex-1 items-center">
       <Text className="font-display text-2xl text-white">{value}</Text>
-      <Text className="text-xs uppercase tracking-wide text-muted">{label}</Text>
+      <Text className="font-head text-xs uppercase tracking-widest text-muted">{label}</Text>
     </View>
   );
 }
@@ -146,14 +146,14 @@ export default function MemberProfile() {
     <View className="flex-1 bg-background">
       <Stack.Screen options={{ headerShown: false }} />
 
-      {/* Cover parallax */}
+      {/* Cover parallax : discret (le dégradé de marque est réservé au match) */}
       <Animated.View
         style={[{ position: 'absolute', top: 0, left: 0, right: 0, height: 200 }, coverStyle]}
       >
         <LinearGradient
-          colors={gradients.candy}
+          colors={gradients.dark}
           start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
+          end={{ x: 0, y: 1 }}
           style={{ flex: 1 }}
         />
       </Animated.View>
@@ -164,7 +164,7 @@ export default function MemberProfile() {
         style={{ position: 'absolute', top: insets.top + 6, left: 16, zIndex: 10 }}
         className="h-10 w-10 items-center justify-center rounded-full bg-black/30"
       >
-        <Ionicons name="chevron-back" size={22} color="#fff" />
+        <Ionicons name="chevron-back" size={22} color={colors.text} />
       </Pressable>
 
       <Animated.ScrollView
@@ -174,27 +174,22 @@ export default function MemberProfile() {
         contentContainerStyle={{ paddingTop: 150, paddingBottom: 40 }}
       >
         <Animated.View entering={FadeInDown.duration(500)} className="items-center px-5">
-          {/* Avatar à anneau dégradé */}
-          <LinearGradient
-            colors={gradients.brand}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={{ padding: 4, borderRadius: 64 }}
-          >
+          {/* Avatar : anneau sobre (le dégradé est réservé aux 3 moments de marque) */}
+          <View style={{ padding: 4, borderRadius: 64, borderWidth: 2, borderColor: colors.border, backgroundColor: colors.surface }}>
             {profile.avatar_url ? (
               <Image
                 source={profile.avatar_url}
-                style={{ height: 112, width: 112, borderRadius: 56, borderWidth: 4, borderColor: '#160E0B' }}
+                style={{ height: 112, width: 112, borderRadius: 56 }}
               />
             ) : (
               <View
                 className="items-center justify-center rounded-full bg-surfaceHigh"
-                style={{ height: 112, width: 112, borderWidth: 4, borderColor: '#160E0B' }}
+                style={{ height: 112, width: 112 }}
               >
                 <Text className="font-display text-3xl text-primary">{initials}</Text>
               </View>
             )}
-          </LinearGradient>
+          </View>
 
           <Text className="mt-3 font-display text-2xl text-white">
             {profile.display_name}
@@ -227,7 +222,7 @@ export default function MemberProfile() {
                     colors={[goalColor(g), `${goalColor(g)}55`]}
                     style={{ height: 64, width: 64, borderRadius: 24, alignItems: 'center', justifyContent: 'center' }}
                   >
-                    <Ionicons name="flame" size={26} color="#160E0B" />
+                    <Ionicons name="flame" size={26} color={colors.background} />
                   </LinearGradient>
                   <Text
                     numberOfLines={1}
@@ -258,7 +253,7 @@ export default function MemberProfile() {
               accessibilityLabel={`En attente de ${firstName}`}
               className="h-14 flex-row items-center justify-center gap-2 rounded-4xl border border-border bg-surface px-5 opacity-70"
             >
-              <Ionicons name="hourglass-outline" size={18} color="#B5A192" />
+              <Ionicons name="hourglass-outline" size={18} color={colors.muted} />
               <Text className="text-base font-semibold text-muted">
                 En attente de {firstName}…
               </Text>
@@ -281,11 +276,11 @@ export default function MemberProfile() {
           )}
           <View className="mt-4 flex-row justify-center gap-8">
             <Pressable onPress={onReport} className="flex-row items-center gap-1.5">
-              <Ionicons name="flag-outline" size={15} color="#B5A192" />
+              <Ionicons name="flag-outline" size={15} color={colors.muted} />
               <Text className="text-muted">Signaler</Text>
             </Pressable>
             <Pressable onPress={onBlock} className="flex-row items-center gap-1.5">
-              <Ionicons name="ban-outline" size={15} color="#B5A192" />
+              <Ionicons name="ban-outline" size={15} color={colors.muted} />
               <Text className="text-muted">Bloquer</Text>
             </Pressable>
           </View>
@@ -319,7 +314,7 @@ export default function MemberProfile() {
               justifyContent: 'center',
             }}
           >
-            <Ionicons name="checkmark" size={64} color="#160E0B" />
+            <Ionicons name="checkmark" size={64} color={colors.background} />
           </LinearGradient>
           <Text className="mt-2 font-display text-2xl text-white">Ça matche !</Text>
           <Text className="text-muted">Vous êtes partants tous les deux…</Text>

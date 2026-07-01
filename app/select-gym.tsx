@@ -24,6 +24,8 @@ import { useSetPrimaryGym } from '@/features/gyms/useSetPrimaryGym';
 import { supabase } from '@/lib/supabase';
 import { darkMapStyle } from '@/theme/mapStyle';
 
+import { colors } from '@/theme/colors';
+
 type GymRow = {
   id: string;
   name: string;
@@ -55,7 +57,7 @@ export default function SelectGym() {
   const chainColor = useMemo(() => {
     const m = new Map<string, string>();
     (chains ?? []).forEach((c: { id: string; brand_color: string | null }) =>
-      m.set(c.id, c.brand_color ?? '#FF6A1A'),
+      m.set(c.id, c.brand_color ?? colors.primary),
     );
     return m;
   }, [chains]);
@@ -128,7 +130,7 @@ export default function SelectGym() {
               <Ionicons
                 name={m === 'near' ? 'navigate' : 'search'}
                 size={15}
-                color={mode === m ? '#160E0B' : '#B5A192'}
+                color={mode === m ? colors.background : colors.muted}
               />
               <Text
                 className={
@@ -179,7 +181,7 @@ export default function SelectGym() {
           <TextInput
             className="h-14 rounded-4xl border border-border bg-surface px-5 text-white"
             placeholder="Ville (ex : Strasbourg, Paris...)"
-            placeholderTextColor="#8A8A99"
+            placeholderTextColor={colors.placeholder}
             value={city}
             onChangeText={setCity}
             accessibilityLabel="Ville"
@@ -243,7 +245,7 @@ export default function SelectGym() {
                 className="flex-row items-center gap-3 rounded-4xl border border-border bg-surface p-4"
               >
                 {logo ? (
-                  <View className="h-11 w-11 items-center justify-center rounded-2xl bg-white p-1.5">
+                  <View className="h-11 w-11 items-center justify-center rounded-full bg-surfaceHigh p-2">
                     <Image
                       source={logo}
                       style={{ width: '100%', height: '100%' }}
@@ -253,14 +255,14 @@ export default function SelectGym() {
                 ) : (
                   <View
                     className="h-11 w-1.5 rounded-full"
-                    style={{ backgroundColor: color ?? '#3A3A48' }}
+                    style={{ backgroundColor: color ?? colors.border }}
                   />
                 )}
                 <View className="flex-1 pr-2">
                   <Text className="text-base font-bold text-white" numberOfLines={1}>
                     {item.name}
                   </Text>
-                  <Text className="text-xs font-semibold text-ember">
+                  <Text className="text-xs font-semibold text-muted">
                     {item.chain_name ?? 'Salle indépendante'}
                   </Text>
                   <Text className="text-sm text-muted" numberOfLines={1}>
@@ -268,7 +270,7 @@ export default function SelectGym() {
                   </Text>
                 </View>
                 {selecting ? (
-                  <ActivityIndicator color="#FF6A1A" />
+                  <ActivityIndicator color={colors.primary} />
                 ) : item.distance_m != null ? (
                   <View className="items-end">
                     <Text className="font-bold text-primary">

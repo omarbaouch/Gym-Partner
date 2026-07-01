@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
@@ -24,7 +23,7 @@ import { usePrimaryGym } from '@/features/gyms/usePrimaryGym';
 import { useIntentsReceived } from '@/features/match/useIntents';
 import { LiveSection } from '@/features/presence/LiveSection';
 import { GOALS, LEVELS, PERIODS } from '@/features/profile/constants';
-import { goalColor, gradients } from '@/theme/colors';
+import { colors, goalColor } from '@/theme/colors';
 
 export default function Discover() {
   const router = useRouter();
@@ -87,7 +86,7 @@ export default function Discover() {
       <View className="flex-row items-center justify-between py-3">
         <View className="flex-1 flex-row items-center gap-3">
           {chainLogoUrl(gym.gym_chains?.name) && (
-            <View className="h-11 w-11 items-center justify-center rounded-2xl bg-white p-1.5">
+            <View className="h-11 w-11 items-center justify-center rounded-full bg-surfaceHigh p-2">
               <Image
                 source={chainLogoUrl(gym.gym_chains?.name)!}
                 style={{ width: '100%', height: '100%' }}
@@ -104,7 +103,7 @@ export default function Discover() {
         </View>
         <View className="flex-row items-center gap-3">
           <Pressable onPress={() => setShowFilters((v) => !v)}>
-            <Text className={isFilterActive(filters) ? 'text-accent' : 'text-primary'}>
+            <Text className={isFilterActive(filters) ? 'font-bold text-primary underline' : 'text-primary'}>
               Filtres
             </Text>
           </Pressable>
@@ -191,31 +190,23 @@ export default function Discover() {
             <RefreshControl
               refreshing={isRefetching}
               onRefresh={refetch}
-              tintColor="#FF7A1A"
-              colors={['#FF7A1A']}
-              progressBackgroundColor="#231811"
+              tintColor={colors.primary}
+              colors={[colors.primary]}
+              progressBackgroundColor={colors.surface}
             />
           }
           ListEmptyComponent={
             <View className="mt-14 items-center gap-3">
-              <LinearGradient
-                colors={gradients.brand}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={{
-                  height: 72,
-                  width: 72,
-                  borderRadius: 36,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
+              <View
+                className="items-center justify-center rounded-full border border-border bg-surfaceHigh"
+                style={{ height: 72, width: 72 }}
               >
                 <Ionicons
                   name={isFilterActive(filters) ? 'search' : 'people'}
                   size={32}
-                  color="#160E0B"
+                  color={colors.primary}
                 />
-              </LinearGradient>
+              </View>
               <Text className="text-center text-muted">
                 {isFilterActive(filters)
                   ? 'Aucun membre ne correspond à ces filtres.'
@@ -250,26 +241,21 @@ function MemberCard({
         accessibilityLabel={`${member.display_name}, niveau ${member.level}`}
         className="flex-row items-center gap-3 rounded-4xl border border-border bg-surface p-4"
       >
-        <LinearGradient
-          colors={gradients.brand}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={{ padding: 2.5, borderRadius: 32 }}
-        >
+        <View style={{ padding: 2.5, borderRadius: 32, borderWidth: 1.5, borderColor: colors.border }}>
           {member.avatar_url ? (
             <Image
               source={member.avatar_url}
-              style={{ height: 56, width: 56, borderRadius: 28, borderWidth: 2.5, borderColor: '#160E0B' }}
+              style={{ height: 56, width: 56, borderRadius: 28 }}
             />
           ) : (
             <View
               className="items-center justify-center rounded-full bg-surfaceHigh"
-              style={{ height: 56, width: 56, borderWidth: 2.5, borderColor: '#160E0B' }}
+              style={{ height: 56, width: 56 }}
             >
               <Text className="font-head text-primary">{initials}</Text>
             </View>
           )}
-        </LinearGradient>
+        </View>
         <View className="flex-1 gap-1">
           <Text className="text-base font-bold text-white">{member.display_name}</Text>
           <View className="flex-row flex-wrap items-center gap-1.5">
@@ -278,8 +264,8 @@ function MemberCard({
                 <Text className="text-xs font-bold text-primary">Partant·e</Text>
               </View>
             )}
-            <View className="rounded-full bg-ember/20 px-2 py-0.5">
-              <Text className="text-xs font-semibold capitalize text-ember">
+            <View className="rounded-full bg-surfaceHigh px-2 py-0.5">
+              <Text className="text-xs font-semibold capitalize text-muted">
                 {member.level}
               </Text>
             </View>

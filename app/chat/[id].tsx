@@ -20,6 +20,8 @@ import { useConversations, type ConversationSummary } from '@/features/chat/useC
 import { supabase } from '@/lib/supabase';
 import type { Message } from '@/types/database';
 
+import { colors } from '@/theme/colors';
+
 export default function Chat() {
   const { id: conversationId } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -103,7 +105,7 @@ export default function Chat() {
           accessibilityLabel="Retour"
           className="h-10 w-10 items-center justify-center rounded-full bg-surface"
         >
-          <Ionicons name="chevron-back" size={22} color="#fff" />
+          <Ionicons name="chevron-back" size={22} color={colors.text} />
         </Pressable>
         {partner?.other_avatar ? (
           <Image
@@ -148,7 +150,7 @@ export default function Chat() {
               const mine = item.sender_id === me;
               return (
                 <View
-                  className={`max-w-[80%] rounded-3xl px-4 py-2.5 ${
+                  className={`max-w-[80%] rounded-4xl px-4 py-2.5 ${
                     mine
                       ? 'self-end rounded-br-md bg-primary'
                       : 'self-start rounded-bl-md border border-border bg-surface'
@@ -167,7 +169,7 @@ export default function Chat() {
           <TextInput
             className="h-14 flex-1 rounded-4xl border border-border bg-surface px-5 text-white"
             placeholder="Écris un message..."
-            placeholderTextColor="#8A8A99"
+            placeholderTextColor={colors.placeholder}
             value={text}
             onChangeText={setText}
             onSubmitEditing={send}
@@ -183,7 +185,7 @@ export default function Chat() {
               !text.trim() ? 'opacity-50' : ''
             }`}
           >
-            <Ionicons name="send" size={20} color="#160E0B" />
+            <Ionicons name="send" size={20} color={colors.background} />
           </Pressable>
         </View>
       </KeyboardAvoidingView>

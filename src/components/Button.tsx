@@ -8,7 +8,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { gradients } from '@/theme/colors';
+import { colors, gradients } from '@/theme/colors';
 
 type Props = {
   label: string;
@@ -55,7 +55,7 @@ export function Button({
             dim ? 'opacity-50' : ''
           }`}
         >
-          {icon && <Ionicons name={icon} size={18} color="#B5A192" />}
+          {icon && <Ionicons name={icon} size={18} color={colors.muted} />}
           <Text className="text-base font-semibold text-muted">{label}</Text>
         </Pressable>
       </Animated.View>
@@ -79,7 +79,7 @@ export function Button({
           end={{ x: 1, y: 1 }}
           style={{
             borderRadius: 28,
-            shadowColor: '#FF7A1A',
+            shadowColor: colors.primary,
             shadowOpacity: 0.45,
             shadowRadius: 18,
             shadowOffset: { width: 0, height: 8 },
@@ -88,10 +88,10 @@ export function Button({
         >
           <View className="h-14 flex-row items-center justify-center gap-2 px-5">
             {loading ? (
-              <ActivityIndicator color="#160E0B" />
+              <ActivityIndicator color={colors.background} />
             ) : (
               <>
-                {icon && <Ionicons name={icon} size={20} color="#160E0B" />}
+                {icon && <Ionicons name={icon} size={20} color={colors.background} />}
                 <Text className="font-display text-base text-background">{label}</Text>
               </>
             )}

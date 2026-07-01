@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, FlatList, Pressable, Text, View } from 'react-native';
@@ -19,7 +18,7 @@ import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
 import { Counter } from '@/components/Counter';
 import { formatRemaining, formatSince } from '@/lib/time';
-import { gradients } from '@/theme/colors';
+import { colors } from '@/theme/colors';
 
 import { DURATIONS, FOCUS_OPTIONS } from './constants';
 import { useCheckIn, useCheckOut, useLiveAtGym, useMyCheckin, type LiveMember } from './useLive';
@@ -60,26 +59,22 @@ function LiveCard({
         accessibilityLabel={`${member.display_name}, ${member.focus}, ici depuis ${formatSince(member.since)}`}
         className="w-36 items-center gap-1.5 rounded-4xl border border-border bg-surface p-3"
       >
-        <LinearGradient
-          colors={gradients.brand}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={{ padding: 2.5, borderRadius: 28 }}
-        >
+        {/* Anneau ember : LA marque visuelle du « live » (personne présente). */}
+        <View style={{ padding: 2.5, borderRadius: 28, borderWidth: 2, borderColor: colors.ember }}>
           {member.avatar_url ? (
             <Image
               source={member.avatar_url}
-              style={{ height: 48, width: 48, borderRadius: 24, borderWidth: 2, borderColor: '#160E0B' }}
+              style={{ height: 48, width: 48, borderRadius: 24 }}
             />
           ) : (
             <View
               className="items-center justify-center rounded-full bg-surfaceHigh"
-              style={{ height: 48, width: 48, borderWidth: 2, borderColor: '#160E0B' }}
+              style={{ height: 48, width: 48 }}
             >
               <Text className="font-head text-primary">{initials}</Text>
             </View>
           )}
-        </LinearGradient>
+        </View>
         <Text className="font-bold text-white" numberOfLines={1}>
           {member.display_name.split(' ')[0]}
         </Text>
@@ -169,32 +164,24 @@ export function LiveSection({
             accessibilityLabel="Je suis à la salle"
             className="flex-row items-center gap-3"
           >
-            <LinearGradient
-              colors={gradients.brand}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={{
-                height: 44,
-                width: 44,
-                borderRadius: 22,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
+            <View
+              className="items-center justify-center rounded-full bg-primary"
+              style={{ height: 44, width: 44 }}
             >
-              <Ionicons name="flash" size={22} color="#160E0B" />
-            </LinearGradient>
+              <Ionicons name="flash" size={22} color={colors.background} />
+            </View>
             <View className="flex-1">
               <Text className="text-base font-bold text-white">Je suis à la salle</Text>
               <Text className="text-sm text-muted">
                 Affiche-toi pour trouver un partenaire, là, maintenant.
               </Text>
             </View>
-            <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={18} color="#B5A192" />
+            <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={18} color={colors.muted} />
           </Pressable>
 
           {expanded && (
             <Animated.View entering={FadeInDown.duration(250)} className="mt-4 gap-3">
-              <Text className="text-xs font-semibold uppercase tracking-wide text-muted">
+              <Text className="font-head text-xs uppercase tracking-widest text-muted">
                 Séance du jour
               </Text>
               <View className="flex-row flex-wrap gap-2">
@@ -202,7 +189,7 @@ export function LiveSection({
                   <Chip key={f} label={f} active={focus === f} onPress={() => setFocus(f)} />
                 ))}
               </View>
-              <Text className="text-xs font-semibold uppercase tracking-wide text-muted">
+              <Text className="font-head text-xs uppercase tracking-widest text-muted">
                 Durée
               </Text>
               <View className="flex-row gap-2">

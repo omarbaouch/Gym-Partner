@@ -9,7 +9,7 @@ import { Button } from '@/components/Button';
 import { Screen } from '@/components/Screen';
 import { AppleSignInButton } from '@/features/auth/AppleSignInButton';
 import { supabase } from '@/lib/supabase';
-import { gradients } from '@/theme/colors';
+import { colors, gradients } from '@/theme/colors';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -44,14 +44,14 @@ export default function SignIn() {
               borderRadius: 28,
               alignItems: 'center',
               justifyContent: 'center',
-              shadowColor: '#FF7A1A',
+              shadowColor: colors.primary,
               shadowOpacity: 0.55,
               shadowRadius: 26,
               shadowOffset: { width: 0, height: 12 },
               elevation: 14,
             }}
           >
-            <Ionicons name="barbell" size={44} color="#160E0B" />
+            <Ionicons name="barbell" size={44} color={colors.background} />
           </LinearGradient>
           <View className="items-center">
             <Text className="font-display text-4xl tracking-tight text-white">
@@ -64,7 +64,7 @@ export default function SignIn() {
         <TextInput
           className={field('email')}
           placeholder="Email"
-          placeholderTextColor="#8A8A99"
+          placeholderTextColor={colors.placeholder}
           autoCapitalize="none"
           keyboardType="email-address"
           value={email}
@@ -76,7 +76,7 @@ export default function SignIn() {
         <TextInput
           className={field('pw')}
           placeholder="Mot de passe"
-          placeholderTextColor="#8A8A99"
+          placeholderTextColor={colors.placeholder}
           secureTextEntry
           value={password}
           onChangeText={setPassword}

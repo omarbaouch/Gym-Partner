@@ -4,19 +4,19 @@ module.exports = {
   presets: [require('nativewind/preset')],
   theme: {
     extend: {
+      // Miroir de src/theme/colors.ts (sémantique documentée là-bas).
       colors: {
         background: '#160E0B',
         surface: '#231811',
         surfaceHigh: '#2E2018',
         border: '#3D2C20',
-        primary: '#FF7A1A', // orange vif
-        ember: '#FF3D77', // rose corail
-        amber: '#FFC53D',
-        mint: '#2DE0C0',
-        violet: '#9B6CFF',
-        accent: '#FF7A1A',
+        primary: '#FF7A1A', // action & sélection
+        ember: '#FF3D77', // live & activité
+        amber: '#FFC53D', // atmosphère uniquement
+        violet: '#9B6CFF', // atmosphère uniquement
         muted: '#B5A192',
-        danger: '#FF4D6D',
+        placeholder: '#9A8574',
+        danger: '#FF453A', // destructif uniquement
       },
       fontFamily: {
         sans: ['Sora_500Medium'],

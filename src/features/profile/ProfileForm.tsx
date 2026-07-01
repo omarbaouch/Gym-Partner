@@ -1,13 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 
 import { Button } from '@/components/Button';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { pickAndUploadAvatar } from '@/lib/avatar';
-import { gradients } from '@/theme/colors';
+import { colors } from '@/theme/colors';
 import type { FitnessLevel, Profile } from '@/types/database';
 
 import { DAYS, GOALS, LEVELS, PERIODS } from './constants';
@@ -120,11 +119,14 @@ export function ProfileForm({
           accessibilityRole="button"
           accessibilityLabel="Changer la photo de profil"
         >
-          <LinearGradient
-            colors={gradients.brand}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={{ padding: 4, borderRadius: 56 }}
+          <View
+            style={{
+              padding: 4,
+              borderRadius: 56,
+              borderWidth: 2,
+              borderColor: colors.border,
+              backgroundColor: colors.surface,
+            }}
           >
             <Image
               source={avatarUrl ?? undefined}
@@ -132,19 +134,17 @@ export function ProfileForm({
                 height: 104,
                 width: 104,
                 borderRadius: 52,
-                borderWidth: 4,
-                borderColor: '#160E0B',
-                backgroundColor: '#231811',
+                backgroundColor: colors.surfaceHigh,
               }}
             />
-          </LinearGradient>
+          </View>
           <View
             className="absolute bottom-0 right-0 h-9 w-9 items-center justify-center rounded-full border-2 border-background bg-primary"
           >
             {uploading ? (
-              <ActivityIndicator size="small" color="#160E0B" />
+              <ActivityIndicator size="small" color={colors.background} />
             ) : (
-              <Ionicons name="camera" size={16} color="#160E0B" />
+              <Ionicons name="camera" size={16} color={colors.background} />
             )}
           </View>
         </Pressable>
@@ -155,9 +155,9 @@ export function ProfileForm({
 
       <Field label="Pseudo">
         <TextInput
-          className="h-12 rounded-2xl bg-surface px-4 text-white"
+          className="h-14 rounded-4xl border border-border bg-surface px-5 text-white"
           placeholder="Ton pseudo"
-          placeholderTextColor="#8A8A99"
+          placeholderTextColor={colors.placeholder}
           value={displayName}
           onChangeText={setDisplayName}
         />
@@ -165,9 +165,9 @@ export function ProfileForm({
 
       <Field label="Bio">
         <TextInput
-          className="min-h-20 rounded-2xl bg-surface p-4 text-white"
+          className="min-h-24 rounded-4xl border border-border bg-surface p-5 text-white"
           placeholder="Tes objectifs, ton expérience..."
-          placeholderTextColor="#8A8A99"
+          placeholderTextColor={colors.placeholder}
           multiline
           value={bio}
           onChangeText={setBio}

@@ -4,6 +4,8 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { Screen } from '@/components/Screen';
 
+import { colors } from '@/theme/colors';
+
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View className="gap-1.5">
@@ -27,7 +29,7 @@ export default function Privacy() {
           accessibilityLabel="Retour"
           className="h-10 w-10 items-center justify-center rounded-full bg-surface"
         >
-          <Ionicons name="chevron-back" size={22} color="#fff" />
+          <Ionicons name="chevron-back" size={22} color={colors.text} />
         </Pressable>
         <Text className="font-display text-xl text-white">Politique de confidentialité</Text>
       </View>

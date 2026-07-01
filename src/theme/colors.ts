@@ -1,32 +1,39 @@
-// Identité visuelle "Ember Pop" — chaude, vive et joyeuse (sunset candy).
-// Source unique de vérité : changer ces valeurs (et tailwind.config.js) suffit
-// à re-thématiser toute l'application.
+// Identité visuelle « Ember Pop » — chaude, vive, sur noir profond.
+// Source unique de vérité : AUCUN hex ne doit vivre dans les écrans.
+//
+// SÉMANTIQUE (une couleur = un sens, pas de double emploi) :
+//   primary  → actions, sélection, liens. Rien d'autre.
+//   ember    → le « live » : présence, activité temps réel, non-lus.
+//   danger   → destructif uniquement (supprimer, bloquer). Vrai rouge,
+//              toujours doublé d'une icône (jamais la couleur seule).
+//   muted    → texte secondaire ; placeholder = sa version atténuée chaude.
+//   amber / violet → atmosphère uniquement (fond vivant, dégradés). Pas d'UI.
 export const colors = {
   background: '#160E0B', // noir chaud
   surface: '#231811',
   surfaceHigh: '#2E2018',
   border: '#3D2C20',
-  primary: '#FF7A1A', // orange vif
-  ember: '#FF3D77', // rose corail
-  amber: '#FFC53D', // jaune doré
-  mint: '#2DE0C0', // menthe (contraste frais)
-  violet: '#9B6CFF', // violet doux
+  primary: '#FF7A1A', // orange vif — action & sélection
+  ember: '#FF3D77', // rose corail — live & activité
+  amber: '#FFC53D', // atmosphère (fond, dégradés)
+  violet: '#9B6CFF', // atmosphère (fond, dégradés)
   text: '#FFFFFF',
   muted: '#B5A192',
-  danger: '#FF4D6D',
+  placeholder: '#9A8574', // gris CHAUD (4.9:1 sur surface) — pas de gris froid
+  danger: '#FF453A', // vrai rouge (5.6:1 sur fond), distinct d'ember
 };
 
-// Dégradés vifs (expo-linear-gradient attend un tableau de couleurs).
+// Dégradés. RÈGLE : gradients.brand est réservé à TROIS moments —
+// le logo, le CTA primaire (Button), et l'écran de match. Partout ailleurs,
+// traitements solides (une signature se protège en ne la diluant pas).
 export const gradients = {
   brand: ['#FFC53D', '#FF7A1A', '#FF3D77'] as const, // jaune→orange→rose
-  ember: ['#FF7A1A', '#FF3D77'] as const,
-  candy: ['#FF3D77', '#9B6CFF'] as const, // rose→violet
-  fresh: ['#2DE0C0', '#FF7A1A'] as const, // menthe→orange
-  dark: ['#231811', '#160E0B'] as const,
+  dark: ['#231811', '#160E0B'] as const, // couvertures discrètes (profil)
   glow: ['rgba(255,122,26,0.34)', 'rgba(22,14,11,0)'] as const,
 };
 
-// Palette joyeuse multi-teintes pour les tags (objectifs, etc.).
+// Palette multi-teintes des tags d'objectifs (identité joyeuse des profils)
+// et du confetti de match. C'est ICI que vivent les teintes secondaires.
 export const accents = [
   '#FF7A1A', // orange
   '#FF3D77', // rose corail

@@ -7,6 +7,8 @@ import { ProfileForm } from '@/features/profile/ProfileForm';
 import { useMyProfile } from '@/features/profile/useMyProfile';
 import { supabase } from '@/lib/supabase';
 
+import { colors } from '@/theme/colors';
+
 // Identifiant de version visible (permet de confirmer le build installé).
 const BUILD_LABEL = 'Gym Partner · v0.1.1 (build 23)';
 
@@ -28,11 +30,11 @@ function ActionRow({
       accessibilityLabel={label}
       className="flex-row items-center gap-3 px-4 py-3.5"
     >
-      <Ionicons name={icon} size={18} color={danger ? '#FF4D6D' : '#B5A192'} />
+      <Ionicons name={icon} size={18} color={danger ? colors.danger : colors.muted} />
       <Text className={`flex-1 font-semibold ${danger ? 'text-danger' : 'text-white'}`}>
         {label}
       </Text>
-      <Ionicons name="chevron-forward" size={16} color="#B5A192" />
+      <Ionicons name="chevron-forward" size={16} color={colors.muted} />
     </Pressable>
   );
 }
@@ -66,7 +68,7 @@ export default function ProfileScreen() {
   if (isLoading) {
     return (
       <Screen>
-        <ActivityIndicator className="mt-10" color="#FF6A1A" />
+        <ActivityIndicator className="mt-10" color={colors.primary} />
       </Screen>
     );
   }

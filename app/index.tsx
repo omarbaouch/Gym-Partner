@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ActivityIndicator, View } from 'react-native';
 
-import { gradients } from '@/theme/colors';
+import { colors, gradients } from '@/theme/colors';
 
 // Écran racine "/" : affiché le temps que l'auth se charge et que la
 // redirection (sign-in / tabs) s'effectue. Évite tout écran vide figé.
@@ -21,9 +21,9 @@ export default function Index() {
           justifyContent: 'center',
         }}
       >
-        <Ionicons name="barbell" size={42} color="#160E0B" />
+        <Ionicons name="barbell" size={42} color={colors.background} />
       </LinearGradient>
-      <ActivityIndicator color="#FF7A1A" />
+      <ActivityIndicator color={colors.primary} />
     </View>
   );
 }

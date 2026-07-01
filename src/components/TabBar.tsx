@@ -92,7 +92,7 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
   return (
     <View
       style={{ paddingBottom: insets.bottom || 8 }}
-      className="border-t border-border bg-surface/85 pt-2"
+      className="border-t border-border bg-surface pt-2"
     >
       {/* indicateur glissant */}
       <Animated.View

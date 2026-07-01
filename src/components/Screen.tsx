@@ -5,6 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ErrorBoundary } from './ErrorBoundary';
 
+import { colors } from '@/theme/colors';
+
 // Import paresseux : si Skia échoue à se lier nativement, l'erreur survient
 // au rendu (et non au chargement du module) → on peut la rattraper et replier
 // sur un dégradé statique au lieu de figer toute l'app.
@@ -14,7 +16,7 @@ const LivingBackground = lazy(() => import('./LivingBackground'));
 function StaticBackground() {
   return (
     <LinearGradient
-      colors={['#160E0B', '#231811', '#160E0B']}
+      colors={[colors.background, colors.surface, colors.background]}
       style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
     />
   );

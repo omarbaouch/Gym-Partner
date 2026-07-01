@@ -24,6 +24,8 @@ import { useNotificationNavigation } from '@/lib/notifications';
 import { registerPushToken } from '@/lib/push';
 import { queryClient } from '@/lib/queryClient';
 
+import { colors } from '@/theme/colors';
+
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 // Police par défaut sur tous les Text/TextInput de l'app.
@@ -74,7 +76,7 @@ function RootNavigation() {
   }, [session, onboarded]);
 
   return (
-    <Stack screenOptions={{ headerShown: false, animation: 'fade', contentStyle: { backgroundColor: '#160E0B' } }}>
+    <Stack screenOptions={{ headerShown: false, animation: 'fade', contentStyle: { backgroundColor: colors.background } }}>
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="select-gym" options={{ presentation: 'modal' }} />
@@ -121,7 +123,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView
-      style={{ flex: 1, backgroundColor: '#160E0B' }}
+      style={{ flex: 1, backgroundColor: colors.background }}
       onLayout={onLayoutRoot}
     >
       <ErrorBoundary>
