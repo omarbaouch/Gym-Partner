@@ -18,6 +18,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '@/components/Button';
 import { Confetti } from '@/components/Confetti';
 import { SkeletonList } from '@/components/Skeleton';
+import { useExpressIntent, useIntentStatus } from '@/features/match/useIntents';
 import {
   REPORT_REASONS,
   useBlockUser,
@@ -43,6 +44,8 @@ export default function MemberProfile() {
   const insets = useSafeAreaInsets();
   const blockUser = useBlockUser();
   const reportUser = useReportUser();
+  const expressIntent = useExpressIntent();
+  const { data: intent } = useIntentStatus(id);
   const [celebrating, setCelebrating] = useState(false);
   const scrollY = useSharedValue(0);
 
@@ -70,20 +73,30 @@ export default function MemberProfile() {
     },
   });
 
-  async function contact() {
-    const { data, error } = await supabase.rpc('get_or_create_conversation', {
-      _other: id,
-    });
-    if (error || !data) {
-      Alert.alert('Erreur', error?.message ?? 'Impossible de démarrer la conversation.');
-      return;
+  const firstName = profile?.display_name?.split(' ')[0] ?? 'ce membre';
+
+  // « Partant·e pour s'entraîner » : intent, et match si c'est réciproque.
+  async function sendIntent() {
+    try {
+      const result = await expressIntent.mutateAsync(id!);
+      if (result.status === 'matched' && result.conversation_id) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+        setCelebrating(true);
+        setTimeout(
+          () =>
+            router.replace({
+              pathname: '/chat/[id]',
+              params: { id: result.conversation_id! },
+            }),
+          1800,
+        );
+      } else {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+        Alert.alert('Demande envoyée', `On prévient ${firstName} !`);
+      }
+    } catch (e) {
+      Alert.alert('Erreur', e instanceof Error ? e.message : 'Action impossible.');
     }
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-    setCelebrating(true);
-    setTimeout(
-      () => router.replace({ pathname: '/chat/[id]', params: { id: data as string } }),
-      1500,
-    );
   }
 
   function onBlock() {
@@ -228,9 +241,44 @@ export default function MemberProfile() {
           </Animated.View>
         ) : null}
 
-        {/* CTA */}
+        {/* CTA : état de la relation (none / sent / received / matched) */}
         <Animated.View entering={FadeInDown.duration(500).delay(220)} className="mt-7 px-5">
-          <Button label="Message" icon="chatbubble-ellipses" onPress={contact} />
+          {intent?.status === 'matched' ? (
+            <Button
+              label="Ouvrir la conversation"
+              icon="chatbubble-ellipses"
+              onPress={() =>
+                intent.conversation_id &&
+                router.push({ pathname: '/chat/[id]', params: { id: intent.conversation_id } })
+              }
+            />
+          ) : intent?.status === 'sent' ? (
+            <View
+              accessible
+              accessibilityLabel={`En attente de ${firstName}`}
+              className="h-14 flex-row items-center justify-center gap-2 rounded-4xl border border-border bg-surface px-5 opacity-70"
+            >
+              <Ionicons name="hourglass-outline" size={18} color="#B5A192" />
+              <Text className="text-base font-semibold text-muted">
+                En attente de {firstName}…
+              </Text>
+            </View>
+          ) : intent?.status === 'received' ? (
+            <Button
+              label={`${firstName} est partant·e — Accepter`}
+              icon="flash"
+              onPress={sendIntent}
+              loading={expressIntent.isPending}
+            />
+          ) : (
+            <Button
+              label="Partant·e pour s'entraîner"
+              icon="flame"
+              onPress={sendIntent}
+              loading={expressIntent.isPending}
+              disabled={!intent}
+            />
+          )}
           <View className="mt-4 flex-row justify-center gap-8">
             <Pressable onPress={onReport} className="flex-row items-center gap-1.5">
               <Ionicons name="flag-outline" size={15} color="#B5A192" />
@@ -273,8 +321,8 @@ export default function MemberProfile() {
           >
             <Ionicons name="checkmark" size={64} color="#160E0B" />
           </LinearGradient>
-          <Text className="mt-2 font-display text-2xl text-white">C'est parti !</Text>
-          <Text className="text-muted">On vous met en relation…</Text>
+          <Text className="mt-2 font-display text-2xl text-white">Ça matche !</Text>
+          <Text className="text-muted">Vous êtes partants tous les deux…</Text>
         </Animated.View>
       )}
     </View>

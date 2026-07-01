@@ -135,6 +135,16 @@ export default function Chat() {
             contentContainerClassName="gap-2 pb-4"
             onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
             renderItem={({ item }) => {
+              // Message « système » de match : pilule centrée, pas une bulle.
+              if (item.content.startsWith('🤝 ')) {
+                return (
+                  <View className="my-1 self-center rounded-full border border-primary/40 bg-primary/10 px-4 py-2">
+                    <Text className="text-center text-xs font-semibold text-primary">
+                      {item.content}
+                    </Text>
+                  </View>
+                );
+              }
               const mine = item.sender_id === me;
               return (
                 <View

@@ -21,6 +21,7 @@ import {
 import { useGymMembers, type Member } from '@/features/discovery/useGymMembers';
 import { chainLogoUrl } from '@/features/gyms/chainLogo';
 import { usePrimaryGym } from '@/features/gyms/usePrimaryGym';
+import { useIntentsReceived } from '@/features/match/useIntents';
 import { LiveSection } from '@/features/presence/LiveSection';
 import { GOALS, LEVELS, PERIODS } from '@/features/profile/constants';
 import { goalColor, gradients } from '@/theme/colors';
@@ -29,6 +30,7 @@ export default function Discover() {
   const router = useRouter();
   const { data: gym, isLoading: gymLoading } = usePrimaryGym();
   const { data: members, isLoading, refetch, isRefetching } = useGymMembers(gym?.id);
+  const { data: received } = useIntentsReceived();
   const [filters, setFilters] = useState<MemberFilters>(emptyFilters);
   const [showFilters, setShowFilters] = useState(false);
 
@@ -170,7 +172,7 @@ export default function Discover() {
           ListHeaderComponent={
             <View className="gap-3 pb-3">
               {/* « Le Live » : le cœur de l'app — qui est là, maintenant. */}
-              <LiveSection gymId={gym.id} />
+              <LiveSection gymId={gym.id} receivedIntents={received} />
               <View className="mt-1 flex-row items-baseline gap-1.5">
                 <Text className="font-head text-xs uppercase tracking-widest text-muted">
                   Aussi inscrits ici
@@ -221,14 +223,24 @@ export default function Discover() {
               </Text>
             </View>
           }
-          renderItem={({ item, index }) => <MemberCard member={item} index={index} />}
+          renderItem={({ item, index }) => (
+            <MemberCard member={item} index={index} hasIntent={received?.has(item.id)} />
+          )}
         />
       )}
     </Screen>
   );
 }
 
-function MemberCard({ member, index }: { member: Member; index: number }) {
+function MemberCard({
+  member,
+  index,
+  hasIntent,
+}: {
+  member: Member;
+  index: number;
+  hasIntent?: boolean;
+}) {
   const initials = member.display_name.slice(0, 2).toUpperCase();
   return (
     <Animated.View entering={FadeInDown.duration(350).delay(Math.min(index, 8) * 45)}>
@@ -261,6 +273,11 @@ function MemberCard({ member, index }: { member: Member; index: number }) {
         <View className="flex-1 gap-1">
           <Text className="text-base font-bold text-white">{member.display_name}</Text>
           <View className="flex-row flex-wrap items-center gap-1.5">
+            {hasIntent && (
+              <View className="rounded-full bg-primary/20 px-2 py-0.5">
+                <Text className="text-xs font-bold text-primary">Partant·e</Text>
+              </View>
+            )}
             <View className="rounded-full bg-ember/20 px-2 py-0.5">
               <Text className="text-xs font-semibold capitalize text-ember">
                 {member.level}
