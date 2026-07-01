@@ -1,6 +1,7 @@
 import { Pressable, Text } from 'react-native';
 
-// Puce sélectionnable (filtres, options) — état actif en couleur primaire.
+// Puce sélectionnable (filtres, options) — état actif : texte SOMBRE sur
+// primary (7.3:1), même règle que Button ; jamais de blanc sur orange (2.6:1).
 export function Chip({
   label,
   active,
@@ -16,9 +17,11 @@ export function Chip({
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ selected: active }}
-      className={`rounded-full px-3 py-1.5 ${active ? 'bg-primary' : 'bg-surface'}`}
+      className={`rounded-full px-4 py-2 ${active ? 'bg-primary' : 'bg-surface'}`}
     >
-      <Text className={active ? 'font-semibold text-white' : 'text-muted'}>{label}</Text>
+      <Text className={active ? 'font-semibold text-background' : 'text-muted'}>
+        {label}
+      </Text>
     </Pressable>
   );
 }

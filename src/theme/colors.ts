@@ -17,7 +17,7 @@ export const colors = {
   ember: '#FF3D77', // rose corail — live & activité
   amber: '#FFC53D', // atmosphère (fond, dégradés)
   violet: '#9B6CFF', // atmosphère (fond, dégradés)
-  text: '#FFFFFF',
+  text: '#FFF4EC', // blanc cassé CHAUD (17.6:1) — jamais de blanc pur
   muted: '#B5A192',
   placeholder: '#9A8574', // gris CHAUD (4.9:1 sur surface) — pas de gris froid
   danger: '#FF453A', // vrai rouge (5.6:1 sur fond), distinct d'ember
@@ -59,5 +59,5 @@ export function getTimeOfDayColors(date: Date = new Date()): TimeOfDayColors {
   const hour = date.getHours();
   if (hour >= 5 && hour < 11) return [colors.amber, colors.primary, colors.ember] as const; // matin
   if (hour >= 11 && hour < 18) return [colors.primary, colors.ember, colors.violet] as const; // jour
-  return [colors.ember, colors.violet, colors.violet] as const; // soir/nuit
+  return [colors.ember, colors.primary, colors.violet] as const; // soir/nuit (ancre primary : la marque reste reconnaissable)
 }

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 
 import { Button } from '@/components/Button';
+import { Chip } from '@/components/Chip';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { pickAndUploadAvatar } from '@/lib/avatar';
 import { colors } from '@/theme/colors';
@@ -13,28 +14,6 @@ import { DAYS, GOALS, LEVELS, PERIODS } from './constants';
 import { useUpdateProfile } from './useMyProfile';
 
 type Slot = { day: string; period: string };
-
-function Chip({
-  label,
-  active,
-  onPress,
-}: {
-  label: string;
-  active: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      accessibilityState={{ selected: active }}
-      className={`rounded-full px-4 py-2 ${active ? 'bg-primary' : 'bg-surface'}`}
-    >
-      <Text className={active ? 'font-semibold text-white' : 'text-muted'}>{label}</Text>
-    </Pressable>
-  );
-}
 
 type Props = {
   initial: Profile | null;

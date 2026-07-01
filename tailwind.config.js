@@ -6,6 +6,9 @@ module.exports = {
     extend: {
       // Miroir de src/theme/colors.ts (sémantique documentée là-bas).
       colors: {
+        // Blanc VOLONTAIREMENT cassé chaud (17.6:1, AAA) : réduit la
+        // halation OLED et unifie la température — text-white = #FFF4EC.
+        white: '#FFF4EC',
         background: '#160E0B',
         surface: '#231811',
         surfaceHigh: '#2E2018',

@@ -36,7 +36,7 @@ function PulseDot() {
     );
   }, [opacity, reduced]);
   const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
-  return <Animated.View style={style} className="h-2 w-2 rounded-full bg-primary" />;
+  return <Animated.View style={style} className="h-2 w-2 rounded-full bg-ember" />;
 }
 
 function LiveCard({
@@ -143,7 +143,7 @@ export function LiveSection({
 
       {/* Mon état : CTA check-in ou carte « visible » */}
       {active ? (
-        <View className="flex-row items-center gap-3 rounded-4xl border border-primary/40 bg-surface p-4">
+        <View className="flex-row items-center gap-3 rounded-4xl border border-ember/40 bg-surface p-4">
           <PulseDot />
           <Text className="flex-1 font-semibold text-white" numberOfLines={1}>
             Tu es visible · {active.focus} · {formatRemaining(active.active_until)}
