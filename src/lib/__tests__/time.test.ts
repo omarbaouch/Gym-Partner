@@ -1,4 +1,10 @@
-import { formatRemaining, formatSince, minutesBetween } from '../time';
+import {
+  formatDayLabel,
+  formatRemaining,
+  formatSessionDate,
+  formatSince,
+  minutesBetween,
+} from '../time';
 
 const NOW = new Date('2026-07-01T18:00:00Z');
 const iso = (minutesAgo: number) =>
@@ -41,5 +47,34 @@ describe('formatRemaining', () => {
 
   it('plancher à 0 quand expiré', () => {
     expect(formatRemaining(iso(10), NOW)).toBe('encore 0 min');
+  });
+});
+
+describe('formatDayLabel / formatSessionDate', () => {
+  // NOW = mercredi 1er juillet 2026 18:00 UTC
+  const local = (s: string) => new Date(s);
+
+  it("aujourd'hui et demain", () => {
+    expect(formatDayLabel(local('2026-07-01T20:00:00'), local('2026-07-01T10:00:00'))).toBe(
+      "aujourd'hui",
+    );
+    expect(formatDayLabel(local('2026-07-02T07:00:00'), local('2026-07-01T23:00:00'))).toBe(
+      'demain',
+    );
+  });
+
+  it('au-delà : jour abrégé + date', () => {
+    expect(formatDayLabel(local('2026-07-04T18:00:00'), local('2026-07-01T10:00:00'))).toBe(
+      'sam. 4 juil.',
+    );
+  });
+
+  it('date de séance complète, minutes optionnelles', () => {
+    expect(
+      formatSessionDate(local('2026-07-02T18:00:00').toISOString(), local('2026-07-01T10:00:00')),
+    ).toBe('demain · 18 h');
+    expect(
+      formatSessionDate(local('2026-07-04T09:30:00').toISOString(), local('2026-07-01T10:00:00')),
+    ).toBe('sam. 4 juil. · 9 h 30');
   });
 });
