@@ -16,5 +16,7 @@ module.exports = {
       },
     ],
   },
+  // Aligne l'alias `@/` sur tsconfig.json.
+  moduleNameMapper: { '^@/(.*)$': '<rootDir>/src/$1' },
   testMatch: ['**/__tests__/**/*.test.ts?(x)'],
 };

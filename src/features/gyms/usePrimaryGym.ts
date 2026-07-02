@@ -14,7 +14,9 @@ export function usePrimaryGym() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('user_gyms')
-        .select('gym_id, gyms ( id, name, city, chain_id, gym_chains ( name ) )')
+        .select(
+          'gym_id, gyms ( id, name, city, chain_id, gym_chains ( name, logo_url ) )',
+        )
         .eq('user_id', userId!)
         .eq('is_primary', true)
         .maybeSingle();

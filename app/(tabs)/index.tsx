@@ -2,7 +2,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { Link, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import {
+  FlatList,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { Button } from '@/components/Button';
@@ -18,7 +25,7 @@ import {
   type MemberFilters,
 } from '@/features/discovery/filters';
 import { useGymMembers, type Member } from '@/features/discovery/useGymMembers';
-import { chainLogoUrl } from '@/features/gyms/chainLogo';
+import { gymLogoUrl } from '@/features/gyms/chainLogo';
 import { usePrimaryGym } from '@/features/gyms/usePrimaryGym';
 import { useIntentsReceived } from '@/features/match/useIntents';
 import { LiveSection } from '@/features/presence/LiveSection';
@@ -81,14 +88,19 @@ export default function Discover() {
     );
   }
 
+  const gymLogo = gymLogoUrl({
+    chain_logo_url: gym.gym_chains?.logo_url,
+    chain_name: gym.gym_chains?.name,
+  });
+
   return (
     <Screen>
       <View className="flex-row items-center justify-between py-3">
         <View className="flex-1 flex-row items-center gap-3">
-          {chainLogoUrl(gym.gym_chains?.name) && (
+          {gymLogo && (
             <View className="h-11 w-11 items-center justify-center rounded-full bg-surfaceHigh p-2">
               <Image
-                source={chainLogoUrl(gym.gym_chains?.name)!}
+                source={gymLogo}
                 style={{ width: '100%', height: '100%' }}
                 contentFit="contain"
               />
@@ -103,7 +115,13 @@ export default function Discover() {
         </View>
         <View className="flex-row items-center gap-3">
           <Pressable onPress={() => setShowFilters((v) => !v)}>
-            <Text className={isFilterActive(filters) ? 'font-bold text-primary underline' : 'text-primary'}>
+            <Text
+              className={
+                isFilterActive(filters)
+                  ? 'font-bold text-primary underline'
+                  : 'text-primary'
+              }
+            >
               Filtres
             </Text>
           </Pressable>
@@ -235,56 +253,63 @@ function MemberCard({
   const initials = member.display_name.slice(0, 2).toUpperCase();
   return (
     <Animated.View entering={FadeInDown.duration(350).delay(Math.min(index, 8) * 45)}>
-    <Link href={{ pathname: '/member/[id]', params: { id: member.id } }} asChild>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={`${member.display_name}, niveau ${member.level}`}
-        className="flex-row items-center gap-3 rounded-4xl border border-border bg-surface p-4"
-      >
-        <View style={{ padding: 2.5, borderRadius: 32, borderWidth: 1.5, borderColor: colors.border }}>
-          {member.avatar_url ? (
-            <Image
-              source={member.avatar_url}
-              style={{ height: 56, width: 56, borderRadius: 28 }}
-            />
-          ) : (
-            <View
-              className="items-center justify-center rounded-full bg-surfaceHigh"
-              style={{ height: 56, width: 56 }}
-            >
-              <Text className="font-head text-primary">{initials}</Text>
-            </View>
-          )}
-        </View>
-        <View className="flex-1 gap-1">
-          <Text className="text-base font-bold text-white">{member.display_name}</Text>
-          <View className="flex-row flex-wrap items-center gap-1.5">
-            {hasIntent && (
-              <View className="rounded-full bg-primary/20 px-2 py-0.5">
-                <Text className="text-xs font-bold text-primary">Partant·e</Text>
+      <Link href={{ pathname: '/member/[id]', params: { id: member.id } }} asChild>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${member.display_name}, niveau ${member.level}`}
+          className="flex-row items-center gap-3 rounded-4xl border border-border bg-surface p-4"
+        >
+          <View
+            style={{
+              padding: 2.5,
+              borderRadius: 32,
+              borderWidth: 1.5,
+              borderColor: colors.border,
+            }}
+          >
+            {member.avatar_url ? (
+              <Image
+                source={member.avatar_url}
+                style={{ height: 56, width: 56, borderRadius: 28 }}
+              />
+            ) : (
+              <View
+                className="items-center justify-center rounded-full bg-surfaceHigh"
+                style={{ height: 56, width: 56 }}
+              >
+                <Text className="font-head text-primary">{initials}</Text>
               </View>
             )}
-            <View className="rounded-full bg-surfaceHigh px-2 py-0.5">
-              <Text className="text-xs font-semibold capitalize text-muted">
-                {member.level}
-              </Text>
-            </View>
-            {member.goals.slice(0, 2).map((g) => (
-              <View
-                key={g}
-                className="rounded-full px-2 py-0.5"
-                style={{ backgroundColor: `${goalColor(g)}26` }}
-              >
-                <Text className="text-xs font-semibold" style={{ color: goalColor(g) }}>
-                  {g}
+          </View>
+          <View className="flex-1 gap-1">
+            <Text className="text-base font-bold text-white">{member.display_name}</Text>
+            <View className="flex-row flex-wrap items-center gap-1.5">
+              {hasIntent && (
+                <View className="rounded-full bg-primary/20 px-2 py-0.5">
+                  <Text className="text-xs font-bold text-primary">Partant·e</Text>
+                </View>
+              )}
+              <View className="rounded-full bg-surfaceHigh px-2 py-0.5">
+                <Text className="text-xs font-semibold capitalize text-muted">
+                  {member.level}
                 </Text>
               </View>
-            ))}
+              {member.goals.slice(0, 2).map((g) => (
+                <View
+                  key={g}
+                  className="rounded-full px-2 py-0.5"
+                  style={{ backgroundColor: `${goalColor(g)}26` }}
+                >
+                  <Text className="text-xs font-semibold" style={{ color: goalColor(g) }}>
+                    {g}
+                  </Text>
+                </View>
+              ))}
+            </View>
           </View>
-        </View>
-        <Text className="text-2xl text-muted">›</Text>
-      </Pressable>
-    </Link>
+          <Text className="text-2xl text-muted">›</Text>
+        </Pressable>
+      </Link>
     </Animated.View>
   );
 }

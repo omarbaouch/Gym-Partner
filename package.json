@@ -14,6 +14,8 @@
     "test": "jest",
     "icons": "node scripts/generate-icons.mjs",
     "db:types": "supabase gen types typescript --local > src/types/database.ts",
+    "gyms:import:osm": "npx tsx supabase/seed/import_gyms.ts",
+    "gyms:import:places": "npx tsx supabase/seed/import_places.ts",
     "prepare": "husky"
   },
   "dependencies": {

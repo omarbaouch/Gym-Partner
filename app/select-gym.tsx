@@ -12,17 +12,17 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { Screen } from '@/components/Screen';
 import { SkeletonList } from '@/components/Skeleton';
-import { chainLogoUrl } from '@/features/gyms/chainLogo';
+import { chainLogoUrl, gymLogoUrl } from '@/features/gyms/chainLogo';
+import { dedupeGyms } from '@/features/gyms/dedupe';
+import { GymMap } from '@/features/gyms/GymMap';
 import { gymSubtitle, formatDistance } from '@/features/gyms/gymLabel';
 import { useChains } from '@/features/gyms/useChains';
-import { useNearbyGyms, useUserLocation, type NearbyGym } from '@/features/gyms/useNearbyGyms';
+import { useNearbyGyms, useUserLocation } from '@/features/gyms/useNearbyGyms';
 import { useSetPrimaryGym } from '@/features/gyms/useSetPrimaryGym';
 import { supabase } from '@/lib/supabase';
-import { darkMapStyle } from '@/theme/mapStyle';
 
 import { colors } from '@/theme/colors';
 
@@ -34,9 +34,11 @@ type GymRow = {
   postal_code?: string | null;
   chain_id?: string | null;
   chain_name?: string | null;
+  chain_logo_url?: string | null;
+  brand_color?: string | null;
   distance_m?: number;
-  latitude?: number;
-  longitude?: number;
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 export default function SelectGym() {
@@ -48,7 +50,12 @@ export default function SelectGym() {
   const [selectingId, setSelectingId] = useState<string | null>(null);
 
   const { data: chains } = useChains();
-  const { data: location, isLoading: locLoading } = useUserLocation();
+  const {
+    data: location,
+    isLoading: locLoading,
+    isFetching: locFetching,
+    refetch: retryLocation,
+  } = useUserLocation();
   const { data: nearby, isLoading: nearbyLoading } = useNearbyGyms(
     mode === 'near' ? location : null,
     chainId,
@@ -68,16 +75,29 @@ export default function SelectGym() {
     queryFn: async (): Promise<GymRow[]> => {
       let q = supabase
         .from('gyms')
-        .select('id, name, city, address, postal_code, chain_id, gym_chains ( name )')
+        .select(
+          'id, name, city, address, postal_code, chain_id, latitude, longitude, gym_chains ( name, logo_url, brand_color )',
+        )
         .ilike('city', `%${city}%`)
+        .order('name')
         .limit(40);
       if (chainId) q = q.eq('chain_id', chainId);
       const { data, error } = await q;
       if (error) throw error;
-      return (data ?? []).map((g) => ({
-        ...g,
-        chain_name: (g.gym_chains as unknown as { name: string } | null)?.name ?? null,
-      }));
+      const rows = (data ?? []).map((g) => {
+        const chain = g.gym_chains as unknown as {
+          name: string;
+          logo_url: string | null;
+          brand_color: string | null;
+        } | null;
+        return {
+          ...g,
+          chain_name: chain?.name ?? null,
+          chain_logo_url: chain?.logo_url ?? null,
+          brand_color: chain?.brand_color ?? null,
+        };
+      });
+      return dedupeGyms(rows);
     },
   });
 
@@ -152,7 +172,10 @@ export default function SelectGym() {
           contentContainerClassName="gap-2"
           renderItem={({ item }) => {
             const active = chainId === item.id;
-            const logo = chainLogoUrl(item.id ? item.name : null);
+            const logo = item.id
+              ? ((item as { logo_url?: string | null }).logo_url ??
+                chainLogoUrl(item.name))
+              : null;
             return (
               <Pressable
                 onPress={() => setChainId(item.id)}
@@ -195,22 +218,31 @@ export default function SelectGym() {
           collapsable={false}
           className="mb-3 h-44 overflow-hidden rounded-4xl border border-border"
         >
-          <MapView
-            provider={PROVIDER_GOOGLE}
-            style={{ flex: 1 }}
-            initialRegion={region}
-            customMapStyle={darkMapStyle}
+          <GymMap region={region} gyms={nearby ?? []} onSelectGym={choose} />
+        </View>
+      )}
+
+      {/* Localisation refusée ou indisponible : proposer de réessayer */}
+      {mode === 'near' && !locLoading && !location && (
+        <View className="mb-3 items-center gap-2 rounded-4xl border border-border bg-surface p-4">
+          <Text className="text-center text-sm text-muted">
+            Position indisponible. Active la localisation dans les réglages puis réessaie,
+            ou passe en recherche par ville.
+          </Text>
+          <Pressable
+            onPress={() => retryLocation()}
+            disabled={locFetching}
+            accessibilityRole="button"
+            accessibilityLabel="Réessayer la localisation"
+            className="flex-row items-center gap-1.5 rounded-full bg-primary/20 px-4 py-2"
           >
-            {(nearby ?? []).map((g: NearbyGym) => (
-              <Marker
-                key={g.id}
-                coordinate={{ latitude: g.latitude, longitude: g.longitude }}
-                title={g.name}
-                description={gymSubtitle(g)}
-                onCalloutPress={() => choose(g.id)}
-              />
-            ))}
-          </MapView>
+            {locFetching ? (
+              <ActivityIndicator size="small" color={colors.primary} />
+            ) : (
+              <Ionicons name="refresh" size={14} color={colors.primary} />
+            )}
+            <Text className="font-bold text-primary">Réessayer</Text>
+          </Pressable>
         </View>
       )}
 
@@ -230,57 +262,59 @@ export default function SelectGym() {
             </Text>
           }
           renderItem={({ item, index }) => {
-            const color = item.chain_id ? chainColor.get(item.chain_id) : undefined;
-            const logo = chainLogoUrl(item.chain_name);
+            const color =
+              item.brand_color ??
+              (item.chain_id ? chainColor.get(item.chain_id) : undefined);
+            const logo = gymLogoUrl(item);
             const selecting = selectingId === item.id;
             return (
               <Animated.View
                 entering={FadeInDown.duration(300).delay(Math.min(index, 8) * 35)}
               >
-              <Pressable
-                onPress={() => choose(item.id)}
-                disabled={!!selectingId}
-                accessibilityRole="button"
-                accessibilityLabel={`${item.name}, ${item.chain_name ?? 'salle indépendante'}`}
-                className="flex-row items-center gap-3 rounded-4xl border border-border bg-surface p-4"
-              >
-                {logo ? (
-                  <View className="h-11 w-11 items-center justify-center rounded-full bg-surfaceHigh p-2">
-                    <Image
-                      source={logo}
-                      style={{ width: '100%', height: '100%' }}
-                      contentFit="contain"
+                <Pressable
+                  onPress={() => choose(item.id)}
+                  disabled={!!selectingId}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${item.name}, ${item.chain_name ?? 'salle indépendante'}`}
+                  className="flex-row items-center gap-3 rounded-4xl border border-border bg-surface p-4"
+                >
+                  {logo ? (
+                    <View className="h-11 w-11 items-center justify-center rounded-full bg-surfaceHigh p-2">
+                      <Image
+                        source={logo}
+                        style={{ width: '100%', height: '100%' }}
+                        contentFit="contain"
+                      />
+                    </View>
+                  ) : (
+                    <View
+                      className="h-11 w-1.5 rounded-full"
+                      style={{ backgroundColor: color ?? colors.border }}
                     />
-                  </View>
-                ) : (
-                  <View
-                    className="h-11 w-1.5 rounded-full"
-                    style={{ backgroundColor: color ?? colors.border }}
-                  />
-                )}
-                <View className="flex-1 pr-2">
-                  <Text className="text-base font-bold text-white" numberOfLines={1}>
-                    {item.name}
-                  </Text>
-                  <Text className="text-xs font-semibold text-muted">
-                    {item.chain_name ?? 'Salle indépendante'}
-                  </Text>
-                  <Text className="text-sm text-muted" numberOfLines={1}>
-                    {gymSubtitle(item)}
-                  </Text>
-                </View>
-                {selecting ? (
-                  <ActivityIndicator color={colors.primary} />
-                ) : item.distance_m != null ? (
-                  <View className="items-end">
-                    <Text className="font-bold text-primary">
-                      {formatDistance(item.distance_m)}
+                  )}
+                  <View className="flex-1 pr-2">
+                    <Text className="text-base font-bold text-white" numberOfLines={1}>
+                      {item.name}
+                    </Text>
+                    <Text className="text-xs font-semibold text-muted">
+                      {item.chain_name ?? 'Salle indépendante'}
+                    </Text>
+                    <Text className="text-sm text-muted" numberOfLines={1}>
+                      {gymSubtitle(item)}
                     </Text>
                   </View>
-                ) : (
-                  <Text className="text-2xl text-muted">›</Text>
-                )}
-              </Pressable>
+                  {selecting ? (
+                    <ActivityIndicator color={colors.primary} />
+                  ) : item.distance_m != null ? (
+                    <View className="items-end">
+                      <Text className="font-bold text-primary">
+                        {formatDistance(item.distance_m)}
+                      </Text>
+                    </View>
+                  ) : (
+                    <Text className="text-2xl text-muted">›</Text>
+                  )}
+                </Pressable>
               </Animated.View>
             );
           }}
