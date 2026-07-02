@@ -105,9 +105,10 @@ psql "postgresql://postgres:<password>@db.<ref>.supabase.co:5432/postgres" \
 Importe **toutes les salles de France depuis Google Places** — la source de
 vérité du référentiel (noms exacts, adresses fiables, salles fermées exclues).
 Nécessite une clé Google Cloud avec **Places API (New)** activée et la
-facturation configurée (~2 500-4 000 requêtes Nearby Search pour la France
-entière, couvert par le crédit mensuel offert ; garde-fou `MAX_REQUESTS`
-intégré) :
+facturation configurée. Coût constaté : la France entière ≈ 12 000 requêtes
+Nearby Search en deux passes (nationale puis `DENSIFY=1` pour les
+centres-villes), SKU Pro ~35 $/1 000 dont 5 000 gratuites/mois — garde-fou
+`MAX_REQUESTS` intégré, et fixe un quota journalier dans la console Google :
 
 ```bash
 GOOGLE_MAPS_API_KEY="<clé>" \

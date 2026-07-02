@@ -24,9 +24,11 @@
  *                         résultats était complet)
  *
  * Prérequis Google Cloud : **Places API (New)** activée + facturation.
- * Ordre de grandeur : ~2 500-4 000 requêtes Nearby Search (SKU Pro) pour la
- * France entière — couvert par le crédit mensuel offert ; le script affiche le
- * compteur en continu et s'arrête au plafond MAX_REQUESTS.
+ * Coût constaté (juillet 2026) : la France entière ≈ 12 000 requêtes Nearby
+ * Search (SKU Pro, ~35 $/1 000, 5 000 gratuites/mois) : passe nationale
+ * ~6 000 req + densification des villes ~6 000 req, pour ~24 000 salles.
+ * Le script affiche le compteur en continu et s'arrête au plafond
+ * MAX_REQUESTS ; pense aussi à fixer un quota journalier côté console Google.
  *
  * Robustesse :
  *  - IDEMPOTENT : upsert par place_id ; relancer met à jour au lieu de dupliquer.
