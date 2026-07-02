@@ -4,6 +4,7 @@ Ce guide te fait passer du code à une **APK Android installable**, étape par �
 Compte ~1 à 2 h la première fois. Tout est gratuit jusqu'à la mise en production.
 
 Sommaire :
+
 1. [Prérequis](#1-prérequis)
 2. [Backend Supabase](#2-backend-supabase-base-de-données--auth)
 3. [Schéma + données](#3-schéma--données)
@@ -29,6 +30,7 @@ npm i -g supabase        # CLI Supabase (ou: brew install supabase/tap/supabase)
 ```
 
 Crée deux comptes gratuits :
+
 - **Supabase** → https://supabase.com
 - **Expo** (pour EAS Build) → https://expo.dev
 
@@ -39,7 +41,7 @@ Pour publier sur le Play Store (étape 9) : un **compte Google Play Console** (2
 ## 2. Backend Supabase (base de données + auth)
 
 1. Sur https://supabase.com/dashboard → **New project**.
-2. **Region : choisis une région UE** (ex. *Frankfurt* ou *Paris*) → important pour le RGPD.
+2. **Region : choisis une région UE** (ex. _Frankfurt_ ou _Paris_) → important pour le RGPD.
 3. Note le **mot de passe** de la base (tu en auras besoin).
 4. Une fois le projet créé, va dans **Project Settings → API** et récupère :
    - `Project URL` → `EXPO_PUBLIC_SUPABASE_URL`
@@ -47,9 +49,30 @@ Pour publier sur le Play Store (étape 9) : un **compte Google Play Console** (2
    - `service_role` key → **secrète**, uniquement pour les scripts serveur / Edge Functions.
 
 ### Activer l'authentification e-mail
+
 - **Authentication → Providers → Email** : activé par défaut.
 - Pour tester vite : **Authentication → Providers → Email → "Confirm email"** peut être
   désactivé temporairement (réactive-le en production).
+
+### Activer la connexion Google
+
+L'app utilise le flux OAuth PKCE de Supabase (`GoogleSignInButton`) : le
+navigateur système s'ouvre, puis revient dans l'app via le deep link
+`gympartner://auth-callback`.
+
+1. Sur https://console.cloud.google.com → **APIs & Services → Credentials** →
+   **Create credentials → OAuth client ID** :
+   - Type **Web application** (c'est Supabase qui reçoit le callback).
+   - **Authorized redirect URIs** : `https://<ref>.supabase.co/auth/v1/callback`.
+   - Note le **Client ID** et le **Client secret**.
+2. Dashboard Supabase → **Authentication → Providers → Google** :
+   - Active le provider, colle **Client ID** + **Client secret**.
+3. Dashboard Supabase → **Authentication → URL Configuration** :
+   - Ajoute `gympartner://auth-callback` dans **Redirect URLs**
+     (et `exp://…` affiché par Expo en dev si tu testes dans Expo Go).
+
+> Le profil est créé automatiquement à la première connexion : le trigger
+> `handle_new_user` (migration 0013) récupère le nom Google (`full_name`).
 
 ---
 
@@ -79,12 +102,29 @@ psql "postgresql://postgres:<password>@db.<ref>.supabase.co:5432/postgres" \
   -f supabase/seed/seed.sql
 ```
 
-Importe les **salles** depuis OpenStreetMap (peut prendre quelques minutes) :
+Charge **toutes les salles de France** (≈ 4 000, snapshot OpenStreetMap avec
+ville/code postal complétés — aucune clé API nécessaire) :
+
+```bash
+psql "postgresql://postgres:<password>@db.<ref>.supabase.co:5432/postgres" \
+  -f supabase/seed/france.sql
+```
+
+Pour **rafraîchir** plus tard depuis OpenStreetMap en direct (idempotent,
+fusionne au lieu de dupliquer) :
 
 ```bash
 SUPABASE_URL="https://<ref>.supabase.co" \
 SUPABASE_SERVICE_ROLE_KEY="<service_role_key>" \
-npx tsx supabase/seed/import_gyms.ts
+npm run gyms:import:osm
+```
+
+(Optionnel) enrichir des villes précises via Google Places — nécessite une clé
+avec **Places API (New)** et facturation :
+
+```bash
+GOOGLE_MAPS_API_KEY=... SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... \
+CITIES="Strasbourg,Paris,Lyon" npm run gyms:import:places
 ```
 
 (Optionnel mais recommandé) régénère les types TypeScript depuis le vrai schéma :
@@ -126,7 +166,7 @@ npm run start
   liste des membres → contacter → chat.
 
 > ⚠️ La **carte** (react-native-maps) et les **notifications push** ne fonctionnent
-> pas dans Expo Go : il faut un *development build* (`eas build --profile development`)
+> pas dans Expo Go : il faut un _development build_ (`eas build --profile development`)
 > ou l'APK `preview`. Le reste de l'app marche dans Expo Go.
 
 Pour tester la mise en relation, crée **2 comptes** sur la **même salle**.
@@ -224,12 +264,14 @@ La base de code est partagée : **aucune réécriture**. Il faut un **compte App
 Developer** (99 $/an) et, pour builder, soit un Mac, soit EAS Build (cloud, sans Mac).
 
 ### a. Configurer l'identifiant et la capability
+
 1. https://developer.apple.com → **Certificates, IDs & Profiles → Identifiers** :
    crée (ou laisse EAS créer) l'App ID `com.gympartner.app`.
 2. Active la capability **Sign in with Apple** sur cet App ID.
    > `eas credentials` peut gérer tout ça automatiquement.
 
 ### b. Activer le provider Apple côté Supabase
+
 - Dashboard Supabase → **Authentication → Providers → Apple** : active-le.
 - Renseigne le **Services ID / Bundle ID** (`com.gympartner.app`). Pour le flux natif
   (celui de l'app), le bundle id suffit ; pour un flux web, ajoute la clé `.p8`,
@@ -240,16 +282,20 @@ Developer** (99 $/an) et, pour builder, soit un Mac, soit EAS Build (cloud, sans
 > (`src/features/auth/AppleSignInButton.tsx`). Le bouton ne s'affiche que sur iOS.
 
 ### c. Builder et tester
+
 ```bash
 eas build -p ios --profile preview          # build interne (simulateur/ad hoc)
 eas build -p ios --profile production        # build App Store
 ```
+
 EAS demande tes identifiants Apple et génère certificats + provisioning profiles.
 
 ### d. TestFlight / App Store
+
 ```bash
 eas submit -p ios                            # envoie le build à App Store Connect
 ```
+
 Puis sur **App Store Connect** : ajoute le build à **TestFlight** (test interne/externe),
 remplis la fiche (confidentialité, captures), et soumets à la revue Apple.
 

@@ -7,6 +7,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { Button } from '@/components/Button';
 import { Screen } from '@/components/Screen';
+import { GoogleSignInButton } from '@/features/auth/GoogleSignInButton';
 import { supabase } from '@/lib/supabase';
 import { colors, gradients } from '@/theme/colors';
 
@@ -38,7 +39,10 @@ export default function SignUp() {
   return (
     <Screen>
       <View className="flex-1 justify-center gap-3">
-        <Animated.View entering={FadeInDown.duration(500)} className="mb-6 items-center gap-4">
+        <Animated.View
+          entering={FadeInDown.duration(500)}
+          className="mb-6 items-center gap-4"
+        >
           <LinearGradient
             colors={gradients.brand}
             start={{ x: 0, y: 0 }}
@@ -101,8 +105,15 @@ export default function SignUp() {
         />
 
         <View className="mt-2">
-          <Button label="S'inscrire" icon="person-add" onPress={onSignUp} loading={loading} />
+          <Button
+            label="S'inscrire"
+            icon="person-add"
+            onPress={onSignUp}
+            loading={loading}
+          />
         </View>
+
+        <GoogleSignInButton />
 
         <Link href="/(auth)/sign-in" className="mt-4 text-center font-head text-primary">
           J'ai déjà un compte

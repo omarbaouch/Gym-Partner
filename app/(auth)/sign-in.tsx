@@ -8,6 +8,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Button } from '@/components/Button';
 import { Screen } from '@/components/Screen';
 import { AppleSignInButton } from '@/features/auth/AppleSignInButton';
+import { GoogleSignInButton } from '@/features/auth/GoogleSignInButton';
 import { supabase } from '@/lib/supabase';
 import { colors, gradients } from '@/theme/colors';
 
@@ -33,7 +34,10 @@ export default function SignIn() {
   return (
     <Screen>
       <View className="flex-1 justify-center gap-3">
-        <Animated.View entering={FadeInDown.duration(500)} className="mb-6 items-center gap-4">
+        <Animated.View
+          entering={FadeInDown.duration(500)}
+          className="mb-6 items-center gap-4"
+        >
           <LinearGradient
             colors={gradients.brand}
             start={{ x: 0, y: 0 }}
@@ -86,9 +90,15 @@ export default function SignIn() {
         />
 
         <View className="mt-2">
-          <Button label="Se connecter" icon="log-in" onPress={onSignIn} loading={loading} />
+          <Button
+            label="Se connecter"
+            icon="log-in"
+            onPress={onSignIn}
+            loading={loading}
+          />
         </View>
 
+        <GoogleSignInButton />
         <AppleSignInButton />
 
         <Link href="/(auth)/sign-up" className="mt-4 text-center font-head text-primary">

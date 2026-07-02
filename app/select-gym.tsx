@@ -1,10 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Keyboard,
   Pressable,
   Text,
   TextInput,
@@ -15,37 +15,25 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { Screen } from '@/components/Screen';
 import { SkeletonList } from '@/components/Skeleton';
-import { chainLogoUrl, gymLogoUrl } from '@/features/gyms/chainLogo';
-import { dedupeGyms } from '@/features/gyms/dedupe';
+import { chainLogoUrl, gymLogoUrl, normalizeChainName } from '@/features/gyms/chainLogo';
 import { GymMap } from '@/features/gyms/GymMap';
 import { gymSubtitle, formatDistance } from '@/features/gyms/gymLabel';
 import { useChains } from '@/features/gyms/useChains';
+import { useCitySearch, type CitySuggestion } from '@/features/gyms/useCities';
 import { useNearbyGyms, useUserLocation } from '@/features/gyms/useNearbyGyms';
 import { useSetPrimaryGym } from '@/features/gyms/useSetPrimaryGym';
-import { supabase } from '@/lib/supabase';
 
 import { colors } from '@/theme/colors';
 
-type GymRow = {
-  id: string;
-  name: string;
-  city: string | null;
-  address?: string | null;
-  postal_code?: string | null;
-  chain_id?: string | null;
-  chain_name?: string | null;
-  chain_logo_url?: string | null;
-  brand_color?: string | null;
-  distance_m?: number;
-  latitude?: number | null;
-  longitude?: number | null;
-};
+// Rayon de recherche autour du centre-ville sélectionné (couvre l'agglomération).
+const CITY_RADIUS_M = 15_000;
 
 export default function SelectGym() {
   const router = useRouter();
   const setPrimary = useSetPrimaryGym();
-  const [mode, setMode] = useState<'near' | 'city'>('near');
-  const [city, setCity] = useState('');
+  const [mode, setMode] = useState<'city' | 'near'>('city');
+  const [cityInput, setCityInput] = useState('');
+  const [selectedCity, setSelectedCity] = useState<CitySuggestion | null>(null);
   const [chainId, setChainId] = useState<string | null>(null);
   const [selectingId, setSelectingId] = useState<string | null>(null);
 
@@ -56,50 +44,47 @@ export default function SelectGym() {
     isFetching: locFetching,
     refetch: retryLocation,
   } = useUserLocation();
-  const { data: nearby, isLoading: nearbyLoading } = useNearbyGyms(
-    mode === 'near' ? location : null,
-    chainId,
+
+  // Suggestions de villes pendant la frappe (tant que rien n'est sélectionné).
+  const { data: citySuggestions } = useCitySearch(
+    cityInput,
+    mode === 'city' && !selectedCity,
   );
 
-  const chainColor = useMemo(() => {
-    const m = new Map<string, string>();
-    (chains ?? []).forEach((c: { id: string; brand_color: string | null }) =>
-      m.set(c.id, c.brand_color ?? colors.primary),
+  // Sélection automatique quand la saisie correspond exactement à une ville.
+  useEffect(() => {
+    if (mode !== 'city' || selectedCity || !citySuggestions?.length) return;
+    const exact = citySuggestions.find(
+      (s: CitySuggestion) => normalizeChainName(s.city) === normalizeChainName(cityInput),
     );
-    return m;
-  }, [chains]);
+    if (exact) {
+      setSelectedCity(exact);
+      setCityInput(exact.city);
+    }
+  }, [mode, selectedCity, citySuggestions, cityInput]);
 
-  const { data: cityGyms, isLoading: cityLoading } = useQuery({
-    queryKey: ['gym-search', city, chainId],
-    enabled: mode === 'city' && city.length >= 2,
-    queryFn: async (): Promise<GymRow[]> => {
-      let q = supabase
-        .from('gyms')
-        .select(
-          'id, name, city, address, postal_code, chain_id, latitude, longitude, gym_chains ( name, logo_url, brand_color )',
-        )
-        .ilike('city', `%${city}%`)
-        .order('name')
-        .limit(40);
-      if (chainId) q = q.eq('chain_id', chainId);
-      const { data, error } = await q;
-      if (error) throw error;
-      const rows = (data ?? []).map((g) => {
-        const chain = g.gym_chains as unknown as {
-          name: string;
-          logo_url: string | null;
-          brand_color: string | null;
-        } | null;
-        return {
-          ...g,
-          chain_name: chain?.name ?? null,
-          chain_logo_url: chain?.logo_url ?? null,
-          brand_color: chain?.brand_color ?? null,
-        };
-      });
-      return dedupeGyms(rows);
-    },
-  });
+  // Un seul moteur de recherche : proximité autour d'un point (position de
+  // l'utilisateur ou centre de la ville choisie), dédupliqué en base + client.
+  const searchCenter = useMemo(
+    () =>
+      mode === 'near'
+        ? (location ?? null)
+        : selectedCity
+          ? { latitude: selectedCity.latitude, longitude: selectedCity.longitude }
+          : null,
+    [mode, location, selectedCity],
+  );
+  const { data: gyms, isLoading: gymsLoading } = useNearbyGyms(
+    searchCenter,
+    chainId,
+    mode === 'near' ? 8000 : CITY_RADIUS_M,
+  );
+
+  function selectCity(s: CitySuggestion) {
+    setSelectedCity(s);
+    setCityInput(s.city);
+    Keyboard.dismiss();
+  }
 
   async function choose(gymId: string) {
     setSelectingId(gymId);
@@ -113,20 +98,22 @@ export default function SelectGym() {
     }
   }
 
-  const rows: GymRow[] = mode === 'near' ? (nearby ?? []) : (cityGyms ?? []);
-  const loading = mode === 'near' ? locLoading || nearbyLoading : cityLoading;
+  const loading =
+    mode === 'near'
+      ? locLoading || (!!location && gymsLoading)
+      : !!selectedCity && gymsLoading;
 
   const region = useMemo(
     () =>
-      location
+      searchCenter
         ? {
-            latitude: location.latitude,
-            longitude: location.longitude,
+            latitude: searchCenter.latitude,
+            longitude: searchCenter.longitude,
             latitudeDelta: 0.08,
             longitudeDelta: 0.08,
           }
         : undefined,
-    [location],
+    [searchCenter],
   );
 
   return (
@@ -134,21 +121,21 @@ export default function SelectGym() {
       <View className="gap-3 py-3">
         <Text className="font-display text-3xl text-white">Choisis ta salle</Text>
 
-        {/* Mode : proximité / ville */}
+        {/* Mode : ville d'abord, puis proximité */}
         <View className="flex-row gap-2 rounded-4xl bg-surface p-1">
-          {(['near', 'city'] as const).map((m) => (
+          {(['city', 'near'] as const).map((m) => (
             <Pressable
               key={m}
               onPress={() => setMode(m)}
               accessibilityRole="button"
-              accessibilityLabel={m === 'near' ? 'Près de moi' : 'Par ville'}
+              accessibilityLabel={m === 'city' ? 'Par ville' : 'Près de moi'}
               accessibilityState={{ selected: mode === m }}
               className={`flex-1 flex-row items-center justify-center gap-1.5 rounded-4xl py-2.5 ${
                 mode === m ? 'bg-primary' : ''
               }`}
             >
               <Ionicons
-                name={m === 'near' ? 'navigate' : 'search'}
+                name={m === 'city' ? 'search' : 'navigate'}
                 size={15}
                 color={mode === m ? colors.background : colors.muted}
               />
@@ -157,7 +144,7 @@ export default function SelectGym() {
                   mode === m ? 'font-bold text-background' : 'font-semibold text-muted'
                 }
               >
-                {m === 'near' ? 'Près de moi' : 'Par ville'}
+                {m === 'city' ? 'Par ville' : 'Près de moi'}
               </Text>
             </Pressable>
           ))}
@@ -201,24 +188,75 @@ export default function SelectGym() {
         />
 
         {mode === 'city' && (
-          <TextInput
-            className="h-14 rounded-4xl border border-border bg-surface px-5 text-white"
-            placeholder="Ville (ex : Strasbourg, Paris...)"
-            placeholderTextColor={colors.placeholder}
-            value={city}
-            onChangeText={setCity}
-            accessibilityLabel="Ville"
-          />
+          <View>
+            <View className="h-14 flex-row items-center rounded-4xl border border-border bg-surface px-5">
+              <TextInput
+                className="flex-1 text-white"
+                placeholder="Ville (ex : Strasbourg, Paris...)"
+                placeholderTextColor={colors.placeholder}
+                value={cityInput}
+                onChangeText={(t) => {
+                  setCityInput(t);
+                  setSelectedCity(null);
+                }}
+                autoCorrect={false}
+                accessibilityLabel="Ville"
+              />
+              {selectedCity ? (
+                <Pressable
+                  onPress={() => {
+                    setCityInput('');
+                    setSelectedCity(null);
+                  }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Effacer la ville"
+                  hitSlop={8}
+                >
+                  <Ionicons name="close-circle" size={20} color={colors.muted} />
+                </Pressable>
+              ) : (
+                <Ionicons name="search" size={18} color={colors.muted} />
+              )}
+            </View>
+
+            {/* Suggestions de villes pendant la frappe */}
+            {!selectedCity && (citySuggestions?.length ?? 0) > 0 && (
+              <View className="mt-2 overflow-hidden rounded-4xl border border-border bg-surface">
+                {(citySuggestions ?? []).map((s: CitySuggestion, i: number) => (
+                  <Pressable
+                    key={`${s.city}-${s.dept ?? ''}`}
+                    onPress={() => selectCity(s)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${s.city}${s.dept ? ` (${s.dept})` : ''}`}
+                    className={`flex-row items-center gap-3 px-4 py-3 ${
+                      i > 0 ? 'border-t border-border' : ''
+                    }`}
+                  >
+                    <Ionicons name="location" size={16} color={colors.primary} />
+                    <Text className="flex-1 font-semibold text-white" numberOfLines={1}>
+                      {s.city}
+                      {s.dept ? (
+                        <Text className="font-normal text-muted"> ({s.dept})</Text>
+                      ) : null}
+                    </Text>
+                    <Text className="text-xs font-semibold text-muted">
+                      {s.gym_count} salle{s.gym_count > 1 ? 's' : ''}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            )}
+          </View>
         )}
       </View>
 
-      {/* Carte des salles proches */}
-      {mode === 'near' && region && (
+      {/* Carte des salles (autour de moi ou de la ville choisie) */}
+      {region && (
         <View
           collapsable={false}
           className="mb-3 h-44 overflow-hidden rounded-4xl border border-border"
         >
-          <GymMap region={region} gyms={nearby ?? []} onSelectGym={choose} />
+          <GymMap region={region} gyms={gyms ?? []} onSelectGym={choose} />
         </View>
       )}
 
@@ -250,21 +288,21 @@ export default function SelectGym() {
         <SkeletonList count={6} />
       ) : (
         <FlatList
-          data={rows}
+          data={searchCenter ? (gyms ?? []) : []}
           keyExtractor={(g) => g.id}
           ItemSeparatorComponent={() => <View className="h-2.5" />}
           contentContainerClassName="pb-6"
+          keyboardShouldPersistTaps="handled"
           ListEmptyComponent={
             <Text className="mt-6 text-center text-muted">
-              {mode === 'near'
-                ? 'Aucune salle proche (active la localisation ou élargis la recherche).'
-                : 'Saisis une ville pour rechercher une salle.'}
+              {mode === 'city'
+                ? selectedCity
+                  ? 'Aucune salle trouvée autour de cette ville.'
+                  : 'Saisis une ville puis choisis-la dans les suggestions.'
+                : 'Aucune salle proche (active la localisation ou élargis la recherche).'}
             </Text>
           }
           renderItem={({ item, index }) => {
-            const color =
-              item.brand_color ??
-              (item.chain_id ? chainColor.get(item.chain_id) : undefined);
             const logo = gymLogoUrl(item);
             const selecting = selectingId === item.id;
             return (
@@ -289,7 +327,7 @@ export default function SelectGym() {
                   ) : (
                     <View
                       className="h-11 w-1.5 rounded-full"
-                      style={{ backgroundColor: color ?? colors.border }}
+                      style={{ backgroundColor: item.brand_color ?? colors.border }}
                     />
                   )}
                   <View className="flex-1 pr-2">
