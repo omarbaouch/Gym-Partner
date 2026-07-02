@@ -29,6 +29,8 @@ import { gymLogoUrl } from '@/features/gyms/chainLogo';
 import { usePrimaryGym } from '@/features/gyms/usePrimaryGym';
 import { useIntentsReceived } from '@/features/match/useIntents';
 import { LiveSection } from '@/features/presence/LiveSection';
+import { useMyNextSession } from '@/features/sessions/useSessions';
+import { formatSessionDate } from '@/lib/time';
 import { GOALS, LEVELS, PERIODS } from '@/features/profile/constants';
 import { colors, goalColor } from '@/theme/colors';
 
@@ -37,6 +39,7 @@ export default function Discover() {
   const { data: gym, isLoading: gymLoading } = usePrimaryGym();
   const { data: members, isLoading, refetch, isRefetching } = useGymMembers(gym?.id);
   const { data: received } = useIntentsReceived();
+  const { data: nextSession } = useMyNextSession();
   const [filters, setFilters] = useState<MemberFilters>(emptyFilters);
   const [showFilters, setShowFilters] = useState(false);
 
@@ -188,6 +191,28 @@ export default function Discover() {
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={
             <View className="gap-3 pb-3">
+              {/* Prochaine séance confirmée : le résultat concret du match. */}
+              {nextSession && (
+                <Pressable
+                  onPress={() =>
+                    router.push({
+                      pathname: '/chat/[id]',
+                      params: { id: nextSession.conversation_id },
+                    })
+                  }
+                  accessibilityRole="button"
+                  accessibilityLabel={`Séance avec ${nextSession.other_name}, ${formatSessionDate(nextSession.scheduled_at)}`}
+                  className="flex-row items-center gap-3 rounded-4xl border border-primary/40 bg-surface p-4"
+                >
+                  <Ionicons name="calendar" size={18} color={colors.primary} />
+                  <Text className="flex-1 font-semibold text-white" numberOfLines={1}>
+                    Séance avec {nextSession.other_name.split(' ')[0]} ·{' '}
+                    {formatSessionDate(nextSession.scheduled_at)}
+                  </Text>
+                  <Ionicons name="chevron-forward" size={16} color={colors.muted} />
+                </Pressable>
+              )}
+
               {/* « Le Live » : le cœur de l'app — qui est là, maintenant. */}
               <LiveSection gymId={gym.id} receivedIntents={received} />
               <View className="mt-1 flex-row items-baseline gap-1.5">

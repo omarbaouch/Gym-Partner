@@ -3,6 +3,7 @@ import { Image } from 'expo-image';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
+  Alert,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -12,15 +13,101 @@ import {
   View,
 } from 'react-native';
 
+import Animated, { FadeInDown } from 'react-native-reanimated';
+
+import { Button } from '@/components/Button';
+import { Chip } from '@/components/Chip';
 import { EmptyState } from '@/components/EmptyState';
 import { Screen } from '@/components/Screen';
 import { markConversationRead } from '@/features/chat/markRead';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useConversations, type ConversationSummary } from '@/features/chat/useConversations';
+import {
+  useConversationSession,
+  useProposeSession,
+  useRespondSession,
+  type Session,
+} from '@/features/sessions/useSessions';
+import { formatDayLabel, formatSessionDate } from '@/lib/time';
 import { supabase } from '@/lib/supabase';
+import { colors } from '@/theme/colors';
 import type { Message } from '@/types/database';
 
-import { colors } from '@/theme/colors';
+// Messages « système » (match, séance) affichés en pilule, pas en bulle.
+const SYSTEM_PREFIXES = ['🤝 ', '📅 ', '✅ ', '❌ '];
+
+// Créneaux proposables : 5 prochains jours × heures habituelles de salle.
+const PROPOSAL_HOURS = [7, 9, 12, 17, 18, 19, 20];
+
+function SessionCard({
+  session,
+  me,
+  conversationId,
+}: {
+  session: Session;
+  me: string | undefined;
+  conversationId: string;
+}) {
+  const respond = useRespondSession();
+  const mine = session.proposer === me;
+  const when = formatSessionDate(session.scheduled_at);
+
+  if (session.status === 'confirmee') {
+    return (
+      <View className="mb-2 flex-row items-center gap-3 rounded-4xl border border-primary/40 bg-surface p-4">
+        <Ionicons name="calendar" size={20} color={colors.primary} />
+        <Text className="flex-1 font-bold text-white">Séance confirmée · {when}</Text>
+      </View>
+    );
+  }
+  return (
+    <View className="mb-2 gap-3 rounded-4xl border border-border bg-surface p-4">
+      <View className="flex-row items-center gap-3">
+        <Ionicons name="calendar-outline" size={20} color={colors.muted} />
+        <Text className="flex-1 font-semibold text-white">
+          Séance proposée · {when}
+        </Text>
+      </View>
+      {mine ? (
+        <View className="flex-row items-center justify-between">
+          <Text className="text-sm text-muted">En attente de confirmation…</Text>
+          <Pressable
+            onPress={() =>
+              respond.mutate({ sessionId: session.id, accept: false, conversationId })
+            }
+            accessibilityRole="button"
+            accessibilityLabel="Annuler la proposition"
+          >
+            <Text className="text-sm text-muted underline">Annuler</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <View className="flex-row gap-2">
+          <View className="flex-1">
+            <Button
+              label="Confirmer"
+              icon="checkmark"
+              onPress={() =>
+                respond.mutate({ sessionId: session.id, accept: true, conversationId })
+              }
+              loading={respond.isPending}
+            />
+          </View>
+          <Pressable
+            onPress={() =>
+              respond.mutate({ sessionId: session.id, accept: false, conversationId })
+            }
+            accessibilityRole="button"
+            accessibilityLabel="Décliner la proposition"
+            className="h-14 items-center justify-center rounded-4xl border border-border px-5"
+          >
+            <Text className="font-semibold text-muted">Décliner</Text>
+          </Pressable>
+        </View>
+      )}
+    </View>
+  );
+}
 
 export default function Chat() {
   const { id: conversationId } = useLocalSearchParams<{ id: string }>();
@@ -39,6 +126,34 @@ export default function Chat() {
     (c: ConversationSummary) => c.conversation_id === conversationId,
   );
   const initials = partner?.other_name?.slice(0, 2).toUpperCase() ?? '';
+
+  // Séance : carte épinglée + panneau de proposition (jour × heure).
+  const { data: activeSession } = useConversationSession(conversationId);
+  const propose = useProposeSession();
+  const [planning, setPlanning] = useState(false);
+  const [dayOffset, setDayOffset] = useState<number | null>(null);
+  const [hour, setHour] = useState<number | null>(null);
+
+  const dayOptions = Array.from({ length: 5 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    return d;
+  });
+
+  async function onPropose() {
+    if (dayOffset === null || hour === null || !conversationId) return;
+    const at = new Date();
+    at.setDate(at.getDate() + dayOffset);
+    at.setHours(hour, 0, 0, 0);
+    try {
+      await propose.mutateAsync({ conversationId, at });
+      setPlanning(false);
+      setDayOffset(null);
+      setHour(null);
+    } catch (e) {
+      Alert.alert('Erreur', e instanceof Error ? e.message : 'Proposition impossible.');
+    }
+  }
 
   useEffect(() => {
     if (!conversationId) return;
@@ -123,6 +238,9 @@ export default function Chat() {
       </View>
 
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        {activeSession && conversationId && (
+          <SessionCard session={activeSession} me={me} conversationId={conversationId} />
+        )}
         {!loadingMessages && messages.length === 0 ? (
           <EmptyState
             icon="chatbubble-ellipses"
@@ -137,8 +255,8 @@ export default function Chat() {
             contentContainerClassName="gap-2 pb-4"
             onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
             renderItem={({ item }) => {
-              // Message « système » de match : pilule centrée, pas une bulle.
-              if (item.content.startsWith('🤝 ')) {
+              // Message « système » (match, séance) : pilule centrée, pas une bulle.
+              if (SYSTEM_PREFIXES.some((p) => item.content.startsWith(p))) {
                 return (
                   <View className="my-1 self-center rounded-full border border-primary/40 bg-primary/10 px-4 py-2">
                     <Text className="text-center text-xs font-semibold text-primary">
@@ -165,7 +283,59 @@ export default function Chat() {
           />
         )}
 
+        {planning && (
+          <Animated.View
+            entering={FadeInDown.duration(250)}
+            className="mb-2 gap-3 rounded-4xl border border-border bg-surface p-4"
+          >
+            <Text className="font-head text-xs uppercase tracking-widest text-muted">
+              Proposer une séance
+            </Text>
+            <View className="flex-row flex-wrap gap-2">
+              {dayOptions.map((d, i) => (
+                <Chip
+                  key={i}
+                  label={formatDayLabel(d)}
+                  active={dayOffset === i}
+                  onPress={() => setDayOffset(i)}
+                />
+              ))}
+            </View>
+            <View className="flex-row flex-wrap gap-2">
+              {PROPOSAL_HOURS.map((h) => {
+                const past = dayOffset === 0 && h <= new Date().getHours();
+                if (past) return null;
+                return (
+                  <Chip key={h} label={`${h} h`} active={hour === h} onPress={() => setHour(h)} />
+                );
+              })}
+            </View>
+            <Button
+              label="Proposer"
+              icon="calendar"
+              onPress={onPropose}
+              loading={propose.isPending}
+              disabled={dayOffset === null || hour === null}
+            />
+          </Animated.View>
+        )}
+
         <View className="flex-row items-center gap-2 pb-3 pt-2">
+          <Pressable
+            onPress={() => setPlanning((v) => !v)}
+            accessibilityRole="button"
+            accessibilityLabel="Proposer une séance"
+            accessibilityState={{ expanded: planning }}
+            className={`h-14 w-14 items-center justify-center rounded-4xl border ${
+              planning ? 'border-primary bg-primary/10' : 'border-border bg-surface'
+            }`}
+          >
+            <Ionicons
+              name={planning ? 'close' : 'calendar-outline'}
+              size={20}
+              color={planning ? colors.primary : colors.muted}
+            />
+          </Pressable>
           <TextInput
             className="h-14 flex-1 rounded-4xl border border-border bg-surface px-5 text-white"
             placeholder="Écris un message..."
