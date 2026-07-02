@@ -1,5 +1,6 @@
 -- Données de départ : principales chaînes de salles en France.
--- Les salles individuelles sont importées via supabase/seed/import_gyms.ts (OpenStreetMap).
+-- Les salles individuelles sont importées depuis Google Places via
+-- supabase/seed/import_france_places.ts (source de vérité du référentiel).
 insert into public.gym_chains (name, brand_color) values
   ('Basic-Fit',     '#FF7A00'),
   ('Fitness Park',  '#111111'),

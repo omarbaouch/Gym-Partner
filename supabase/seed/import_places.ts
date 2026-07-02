@@ -1,6 +1,7 @@
 /**
- * Importe des salles de sport FIABLES depuis Google Places (NOUVELLE version)
- * vers `public.gyms`. Noms exacts + adresses + coordonnées, dédupliqués par place_id.
+ * Importe des salles de sport depuis Google Places (New) pour des VILLES
+ * précises, vers `public.gyms`. Complément ciblé de import_france_places.ts
+ * (couverture nationale) : utile pour rafraîchir une agglomération.
  *
  * Prérequis Google Cloud : activer **Places API (New)** + (pour la carte) **Maps SDK
  * for Android**, facturation activée, et la clé autorisée pour Places API (New).
@@ -16,8 +17,8 @@
  *  - IDEMPOTENT : upsert par place_id ; relancer met à jour au lieu de dupliquer.
  *  - Les enseignes interrogées et le rattachement viennent de la base
  *    (`gym_chains` + `gym_chain_aliases`, migration 0012).
- *  - Le trigger `gyms_dedupe_on_insert` fusionne tout doublon résiduel
- *    (ex. même salle déjà importée depuis OpenStreetMap).
+ *  - Le trigger `gyms_dedupe_on_insert` (migrations 0012/0014) fusionne tout
+ *    doublon résiduel, les données Google faisant autorité.
  */
 import { createClient } from '@supabase/supabase-js';
 

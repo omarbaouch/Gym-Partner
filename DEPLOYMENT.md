@@ -102,25 +102,32 @@ psql "postgresql://postgres:<password>@db.<ref>.supabase.co:5432/postgres" \
   -f supabase/seed/seed.sql
 ```
 
-Charge **toutes les salles de France** (≈ 4 000, snapshot OpenStreetMap avec
-ville/code postal complétés — aucune clé API nécessaire) :
+Importe **toutes les salles de France depuis Google Places** — la source de
+vérité du référentiel (noms exacts, adresses fiables, salles fermées exclues).
+Nécessite une clé Google Cloud avec **Places API (New)** activée et la
+facturation configurée (~2 500-4 000 requêtes Nearby Search pour la France
+entière, couvert par le crédit mensuel offert ; garde-fou `MAX_REQUESTS`
+intégré) :
 
 ```bash
-psql "postgresql://postgres:<password>@db.<ref>.supabase.co:5432/postgres" \
-  -f supabase/seed/france.sql
-```
-
-Pour **rafraîchir** plus tard depuis OpenStreetMap en direct (idempotent,
-fusionne au lieu de dupliquer) :
-
-```bash
+GOOGLE_MAPS_API_KEY="<clé>" \
 SUPABASE_URL="https://<ref>.supabase.co" \
 SUPABASE_SERVICE_ROLE_KEY="<service_role_key>" \
-npm run gyms:import:osm
+npm run gyms:import:france
 ```
 
-(Optionnel) enrichir des villes précises via Google Places — nécessite une clé
-avec **Places API (New)** et facturation :
+Le script est **idempotent** : le relancer met à jour au lieu de dupliquer
+(clé `place_id` + trigger anti-doublon). Si ta base contient d'anciennes
+données (seeds manuels, imports OpenStreetMap), les salles Google **écrasent**
+automatiquement leurs doublons ; pour supprimer ensuite le reste des salles
+non-Google sans utilisateur, ajoute `PURGE_NON_GOOGLE=1` :
+
+```bash
+PURGE_NON_GOOGLE=1 GOOGLE_MAPS_API_KEY=... SUPABASE_URL=... \
+SUPABASE_SERVICE_ROLE_KEY=... npm run gyms:import:france
+```
+
+(Optionnel) rafraîchir une agglomération précise :
 
 ```bash
 GOOGLE_MAPS_API_KEY=... SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... \
