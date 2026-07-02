@@ -17,6 +17,11 @@
  * Options (variables d'environnement) :
  *   MAX_REQUESTS=6000     plafond de requêtes Places (garde-fou de coût)
  *   PURGE_NON_GOOGLE=1    supprime ensuite les salles non-Google sans utilisateur
+ *   DENSIFY=1             2e passe : ne re-quadrille que les zones denses à
+ *                         partir des salles déjà en base (complète les
+ *                         centres-villes sans re-payer les zones rurales,
+ *                         déjà exhaustives — un disque ayant renvoyé < 20
+ *                         résultats était complet)
  *
  * Prérequis Google Cloud : **Places API (New)** activée + facturation.
  * Ordre de grandeur : ~2 500-4 000 requêtes Nearby Search (SKU Pro) pour la
@@ -35,10 +40,12 @@ import { loadChainMatcher } from './chains';
 import {
   MIN_RADIUS_M,
   cellsFromPoints,
+  denseCellsFromPoints,
   parseGoogleAddress,
   subdivideCell,
   type AddressComponent,
   type Cell,
+  type Point,
 } from './places_grid';
 
 const KEY = process.env.GOOGLE_MAPS_API_KEY!;
@@ -46,6 +53,13 @@ const SUPABASE_URL = process.env.SUPABASE_URL!;
 const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const MAX_REQUESTS = Number(process.env.MAX_REQUESTS ?? 6000);
 const PURGE_NON_GOOGLE = process.env.PURGE_NON_GOOGLE === '1';
+const DENSIFY = process.env.DENSIFY === '1';
+
+// Mode densification : carreaux de 0.1° (~9 km de rayon) contenant au moins
+// 3 salles connues. Seuil bas volontaire : mieux vaut re-vérifier un carreau
+// déjà complet (1 requête) que manquer un centre-ville saturé.
+const DENSIFY_DEG = 0.1;
+const DENSIFY_MIN_GYMS = 3;
 
 const COMMUNES_URL = 'https://geo.api.gouv.fr/communes?fields=nom,centre&format=json';
 const NEARBY_URL = 'https://places.googleapis.com/v1/places:searchNearby';
@@ -108,22 +122,51 @@ async function main() {
   const db = createClient(SUPABASE_URL, SERVICE_ROLE);
   const chains = await loadChainMatcher(db);
 
-  // 1. Cellules initiales : uniquement là où il y a des communes.
-  const communesRes = await fetch(COMMUNES_URL);
-  if (!communesRes.ok) throw new Error(`geo.api.gouv.fr ${communesRes.status}`);
-  const communes = (await communesRes.json()) as {
-    centre?: { coordinates: [number, number] };
-  }[];
-  const points = communes
-    .filter((c) => c.centre)
-    .map((c) => ({
-      latitude: c.centre!.coordinates[1],
-      longitude: c.centre!.coordinates[0],
-    }));
-  const queue: Cell[] = cellsFromPoints(points);
-  console.log(
-    `Quadrillage initial : ${queue.length} cellules (plafond ${MAX_REQUESTS} requêtes).`,
-  );
+  // 1. Cellules initiales.
+  let queue: Cell[];
+  if (DENSIFY) {
+    // Densification : zones où la base contient déjà ≥ N salles (les zones
+    // rurales de la 1re passe étaient complètes, inutile de les re-payer).
+    const gymPoints: Point[] = [];
+    for (let from = 0; ; from += 1000) {
+      const { data, error } = await db
+        .from('gyms')
+        .select('latitude, longitude')
+        .not('latitude', 'is', null)
+        .not('longitude', 'is', null)
+        .range(from, from + 999);
+      if (error) throw error;
+      for (const g of data ?? []) {
+        gymPoints.push({
+          latitude: g.latitude as number,
+          longitude: g.longitude as number,
+        });
+      }
+      if (!data || data.length < 1000) break;
+    }
+    queue = denseCellsFromPoints(gymPoints, DENSIFY_DEG, DENSIFY_MIN_GYMS);
+    console.log(
+      `Densification : ${queue.length} cellules denses (${gymPoints.length} salles en base, ` +
+        `plafond ${MAX_REQUESTS} requêtes).`,
+    );
+  } else {
+    // Passe nationale : uniquement là où il y a des communes.
+    const communesRes = await fetch(COMMUNES_URL);
+    if (!communesRes.ok) throw new Error(`geo.api.gouv.fr ${communesRes.status}`);
+    const communes = (await communesRes.json()) as {
+      centre?: { coordinates: [number, number] };
+    }[];
+    const points = communes
+      .filter((c) => c.centre)
+      .map((c) => ({
+        latitude: c.centre!.coordinates[1],
+        longitude: c.centre!.coordinates[0],
+      }));
+    queue = cellsFromPoints(points);
+    console.log(
+      `Quadrillage initial : ${queue.length} cellules (plafond ${MAX_REQUESTS} requêtes).`,
+    );
+  }
 
   // 2. Parcours du quadrillage, subdivision des cellules saturées.
   const found = new Map<string, Place>();

@@ -2,6 +2,7 @@ import {
   CELL_DEG,
   cellRadiusM,
   cellsFromPoints,
+  denseCellsFromPoints,
   parseGoogleAddress,
   subdivideCell,
 } from '../places_grid';
@@ -32,6 +33,26 @@ describe('cellsFromPoints', () => {
     // Rayon ≥ demi-diagonale du carreau (≈ 16 km à cette latitude).
     expect(cell.radiusM).toBeGreaterThan(15_000);
     expect(cell.radiusM).toBeLessThan(25_000);
+  });
+});
+
+describe('denseCellsFromPoints', () => {
+  it('ne retient que les carreaux atteignant le seuil de salles', () => {
+    const dense = [
+      { latitude: 48.851, longitude: 2.341 },
+      { latitude: 48.852, longitude: 2.342 },
+      { latitude: 48.853, longitude: 2.343 },
+    ];
+    const sparse = [{ latitude: 45.05, longitude: 3.05 }];
+    const cells = denseCellsFromPoints([...dense, ...sparse], 0.1, 3);
+    expect(cells).toHaveLength(1);
+    expect(Math.abs(cells[0].latitude - 48.85)).toBeLessThan(0.1);
+  });
+
+  it('retourne vide sous le seuil', () => {
+    expect(
+      denseCellsFromPoints([{ latitude: 48.85, longitude: 2.34 }], 0.1, 3),
+    ).toHaveLength(0);
   });
 });
 

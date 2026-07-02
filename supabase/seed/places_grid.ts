@@ -49,6 +49,31 @@ export function cellsFromPoints(points: Point[], deg = CELL_DEG): Cell[] {
   return cells;
 }
 
+// Cellules « densification » : carreaux fins (`deg`°) contenant au moins
+// `minPoints` salles déjà connues. Sert à compléter les zones urbaines après
+// une première passe nationale, sans re-payer les zones rurales déjà
+// exhaustives (un disque qui a renvoyé < 20 résultats était complet).
+export function denseCellsFromPoints(
+  points: Point[],
+  deg: number,
+  minPoints: number,
+): Cell[] {
+  const counts = new Map<string, number>();
+  for (const p of points) {
+    const key = `${Math.floor(p.latitude / deg)}:${Math.floor(p.longitude / deg)}`;
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  const cells: Cell[] = [];
+  for (const [key, n] of counts) {
+    if (n < minPoints) continue;
+    const [ky, kx] = key.split(':').map(Number);
+    const latitude = (ky + 0.5) * deg;
+    const longitude = (kx + 0.5) * deg;
+    cells.push({ latitude, longitude, radiusM: cellRadiusM(deg, latitude) });
+  }
+  return cells;
+}
+
 // Subdivision d'une cellule saturée (20 résultats) en 4 quadrants.
 export function subdivideCell(cell: Cell): Cell[] {
   const r = cell.radiusM / 2;
