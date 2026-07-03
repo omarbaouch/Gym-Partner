@@ -1,8 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 
+import { showError, showInfo } from '@/components/AppDialog';
 import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -23,12 +31,7 @@ type Props = {
 };
 
 // Formulaire de profil réutilisé par l'onboarding et l'édition du profil.
-export function ProfileForm({
-  initial,
-  submitLabel,
-  markOnboarded,
-  onSubmitted,
-}: Props) {
+export function ProfileForm({ initial, submitLabel, markOnboarded, onSubmitted }: Props) {
   const { session } = useAuth();
   const userId = session?.user.id;
   const update = useUpdateProfile();
@@ -47,9 +50,7 @@ export function ProfileForm({
   const [uploading, setUploading] = useState(false);
 
   function toggle(list: string[], value: string) {
-    return list.includes(value)
-      ? list.filter((v) => v !== value)
-      : [...list, value];
+    return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
   }
 
   async function onPickAvatar() {
@@ -59,7 +60,7 @@ export function ProfileForm({
       const url = await pickAndUploadAvatar(userId);
       if (url) setAvatarUrl(url);
     } catch (e) {
-      Alert.alert('Erreur', e instanceof Error ? e.message : 'Upload impossible');
+      showError(e instanceof Error ? e.message : 'Upload impossible');
     } finally {
       setUploading(false);
     }
@@ -67,7 +68,7 @@ export function ProfileForm({
 
   async function onSubmit() {
     if (!displayName.trim()) {
-      Alert.alert('Pseudo requis', 'Choisis un pseudo pour continuer.');
+      showInfo('Pseudo requis', 'Choisis un pseudo pour continuer.');
       return;
     }
     const usual_slots: Slot[] = days.flatMap((day) =>
@@ -85,7 +86,7 @@ export function ProfileForm({
       } as Partial<Profile>);
       onSubmitted();
     } catch (e) {
-      Alert.alert('Erreur', e instanceof Error ? e.message : 'Enregistrement impossible');
+      showError(e instanceof Error ? e.message : 'Enregistrement impossible');
     }
   }
 
@@ -117,9 +118,7 @@ export function ProfileForm({
               }}
             />
           </View>
-          <View
-            className="absolute bottom-0 right-0 h-9 w-9 items-center justify-center rounded-full border-2 border-background bg-primary"
-          >
+          <View className="absolute bottom-0 right-0 h-9 w-9 items-center justify-center rounded-full border-2 border-background bg-primary">
             {uploading ? (
               <ActivityIndicator size="small" color={colors.background} />
             ) : (

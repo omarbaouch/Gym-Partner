@@ -10,13 +10,7 @@ import Animated, {
 const AnimatedInput = Animated.createAnimatedComponent(TextInput);
 
 // Nombre qui s'incrémente en douceur jusqu'à `value`.
-export function Counter({
-  value,
-  className,
-}: {
-  value: number;
-  className?: string;
-}) {
+export function Counter({ value, className }: { value: number; className?: string }) {
   const v = useSharedValue(0);
   const reduced = useReducedMotion();
   useEffect(() => {
@@ -24,9 +18,7 @@ export function Counter({
     v.value = reduced ? value : withTiming(value, { duration: 700 });
   }, [value, v, reduced]);
 
-  const props = useAnimatedProps(
-    () => ({ text: String(Math.round(v.value)) }) as object,
-  );
+  const props = useAnimatedProps(() => ({ text: String(Math.round(v.value)) }) as object);
 
   return (
     <AnimatedInput
@@ -35,6 +27,16 @@ export function Counter({
       value={String(value)}
       animatedProps={props}
       className={className}
+      // Un TextInput a un padding vertical et un « font padding » Android par
+      // défaut : le chiffre paraît décalé par rapport aux Text voisins. On les
+      // neutralise pour un centrage identique à un Text.
+      style={{
+        padding: 0,
+        margin: 0,
+        includeFontPadding: false,
+        textAlignVertical: 'center',
+      }}
+      allowFontScaling={false}
     />
   );
 }

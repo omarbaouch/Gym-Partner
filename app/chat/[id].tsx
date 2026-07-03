@@ -3,7 +3,6 @@ import { Image } from 'expo-image';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
-  Alert,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -15,13 +14,17 @@ import {
 
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
+import { showError } from '@/components/AppDialog';
 import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
 import { EmptyState } from '@/components/EmptyState';
 import { Screen } from '@/components/Screen';
 import { markConversationRead } from '@/features/chat/markRead';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { useConversations, type ConversationSummary } from '@/features/chat/useConversations';
+import {
+  useConversations,
+  type ConversationSummary,
+} from '@/features/chat/useConversations';
 import {
   useConversationSession,
   useProposeSession,
@@ -64,9 +67,7 @@ function SessionCard({
     <View className="mb-2 gap-3 rounded-4xl border border-border bg-surface p-4">
       <View className="flex-row items-center gap-3">
         <Ionicons name="calendar-outline" size={20} color={colors.muted} />
-        <Text className="flex-1 font-semibold text-white">
-          Séance proposée · {when}
-        </Text>
+        <Text className="flex-1 font-semibold text-white">Séance proposée · {when}</Text>
       </View>
       {mine ? (
         <View className="flex-row items-center justify-between">
@@ -151,7 +152,7 @@ export default function Chat() {
       setDayOffset(null);
       setHour(null);
     } catch (e) {
-      Alert.alert('Erreur', e instanceof Error ? e.message : 'Proposition impossible.');
+      showError(e instanceof Error ? e.message : 'Proposition impossible.');
     }
   }
 
@@ -237,7 +238,10 @@ export default function Chat() {
         </Text>
       </View>
 
-      <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
         {activeSession && conversationId && (
           <SessionCard session={activeSession} me={me} conversationId={conversationId} />
         )}
@@ -306,7 +310,12 @@ export default function Chat() {
                 const past = dayOffset === 0 && h <= new Date().getHours();
                 if (past) return null;
                 return (
-                  <Chip key={h} label={`${h} h`} active={hour === h} onPress={() => setHour(h)} />
+                  <Chip
+                    key={h}
+                    label={`${h} h`}
+                    active={hour === h}
+                    onPress={() => setHour(h)}
+                  />
                 );
               })}
             </View>

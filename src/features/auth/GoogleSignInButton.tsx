@@ -2,8 +2,9 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, Text } from 'react-native';
+import { ActivityIndicator, Pressable, Text } from 'react-native';
 
+import { showError } from '@/components/AppDialog';
 import { supabase } from '@/lib/supabase';
 
 // Termine proprement une session d'authentification restée ouverte
@@ -48,9 +49,9 @@ export function GoogleSignInButton() {
     try {
       await signInWithGoogle();
     } catch (e) {
-      Alert.alert(
-        'Connexion Google impossible',
+      showError(
         e instanceof Error ? e.message : 'Réessaie dans un instant.',
+        'Connexion Google impossible',
       );
     } finally {
       setLoading(false);

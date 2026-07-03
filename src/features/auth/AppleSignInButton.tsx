@@ -1,7 +1,8 @@
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useEffect, useState } from 'react';
-import { Alert, Platform } from 'react-native';
+import { Platform } from 'react-native';
 
+import { showError } from '@/components/AppDialog';
 import { supabase } from '@/lib/supabase';
 
 // Bouton "Sign in with Apple" — affiché uniquement sur iOS (et si disponible).
@@ -46,7 +47,7 @@ export function AppleSignInButton() {
       }
     } catch (e) {
       if (e instanceof Error && e.message.includes('canceled')) return;
-      Alert.alert('Connexion Apple impossible', e instanceof Error ? e.message : '');
+      showError(e instanceof Error ? e.message : '', 'Connexion Apple impossible');
     }
   }
 

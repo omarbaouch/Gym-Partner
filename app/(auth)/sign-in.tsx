@@ -2,9 +2,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Text, TextInput, View } from 'react-native';
+import { Text, TextInput, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
+import { showError } from '@/components/AppDialog';
 import { Button } from '@/components/Button';
 import { Screen } from '@/components/Screen';
 import { AppleSignInButton } from '@/features/auth/AppleSignInButton';
@@ -22,7 +23,7 @@ export default function SignIn() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) Alert.alert('Connexion impossible', error.message);
+    if (error) showError(error.message, 'Connexion impossible');
   }
 
   function field(name: string) {

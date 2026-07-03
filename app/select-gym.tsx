@@ -15,6 +15,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { Screen } from '@/components/Screen';
 import { SkeletonList } from '@/components/Skeleton';
+import { showError } from '@/components/AppDialog';
 import { chainLogoUrl, gymLogoUrl, normalizeChainName } from '@/features/gyms/chainLogo';
 import { GymMap } from '@/features/gyms/GymMap';
 import { gymSubtitle, formatDistance } from '@/features/gyms/gymLabel';
@@ -94,7 +95,7 @@ export default function SelectGym() {
       else router.replace('/(tabs)');
     } catch (e) {
       setSelectingId(null);
-      alert(e instanceof Error ? e.message : 'Sélection impossible');
+      showError(e instanceof Error ? e.message : 'Sélection impossible');
     }
   }
 

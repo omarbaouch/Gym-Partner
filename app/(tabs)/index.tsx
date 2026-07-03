@@ -215,7 +215,7 @@ export default function Discover() {
 
               {/* « Le Live » : le cœur de l'app — qui est là, maintenant. */}
               <LiveSection gymId={gym.id} receivedIntents={received} />
-              <View className="mt-1 flex-row items-baseline gap-1.5">
+              <View className="mt-1 flex-row items-center gap-1.5">
                 <Text className="font-head text-xs uppercase tracking-widest text-muted">
                   Aussi inscrits ici
                 </Text>

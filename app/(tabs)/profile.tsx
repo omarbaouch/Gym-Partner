@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
+import { showDialog, showError, showInfo } from '@/components/AppDialog';
 import { Screen } from '@/components/Screen';
 import { ProfileForm } from '@/features/profile/ProfileForm';
 import { useMyProfile } from '@/features/profile/useMyProfile';
@@ -44,25 +45,26 @@ export default function ProfileScreen() {
   const { data: profile, isLoading } = useMyProfile();
 
   function onDeleteAccount() {
-    Alert.alert(
-      'Supprimer mon compte',
-      'Cette action est définitive : ton profil, tes salles et tes messages seront effacés.',
-      [
-        { text: 'Annuler', style: 'cancel' },
+    showDialog({
+      title: 'Supprimer mon compte',
+      message:
+        'Cette action est définitive : ton profil, tes salles et tes messages seront effacés.',
+      actions: [
+        { label: 'Annuler', style: 'cancel' },
         {
-          text: 'Supprimer',
+          label: 'Supprimer',
           style: 'destructive',
           onPress: async () => {
             const { error } = await supabase.functions.invoke('delete-account');
             if (error) {
-              Alert.alert('Erreur', 'Suppression impossible. Réessaie plus tard.');
+              showError('Suppression impossible. Réessaie plus tard.');
               return;
             }
             await supabase.auth.signOut();
           },
         },
       ],
-    );
+    });
   }
 
   if (isLoading) {
@@ -79,7 +81,7 @@ export default function ProfileScreen() {
       <ProfileForm
         initial={profile}
         submitLabel="Enregistrer"
-        onSubmitted={() => Alert.alert('Enregistré', 'Profil mis à jour.')}
+        onSubmitted={() => showInfo('Enregistré', 'Profil mis à jour.')}
       />
       <View className="gap-4 pb-6">
         <View className="overflow-hidden rounded-4xl border border-border bg-surface">

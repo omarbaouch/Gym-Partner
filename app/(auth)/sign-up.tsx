@@ -2,9 +2,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Text, TextInput, View } from 'react-native';
+import { Text, TextInput, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
+import { showError, showInfo } from '@/components/AppDialog';
 import { Button } from '@/components/Button';
 import { Screen } from '@/components/Screen';
 import { GoogleSignInButton } from '@/features/auth/GoogleSignInButton';
@@ -26,8 +27,8 @@ export default function SignUp() {
       options: { data: { display_name: displayName } },
     });
     setLoading(false);
-    if (error) Alert.alert('Inscription impossible', error.message);
-    else Alert.alert('Bienvenue', 'Vérifie ta boîte mail pour confirmer ton compte.');
+    if (error) showError(error.message, 'Inscription impossible');
+    else showInfo('Bienvenue', 'Vérifie ta boîte mail pour confirmer ton compte.');
   }
 
   function field(name: string) {

@@ -3,7 +3,7 @@ import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, FlatList, Pressable, Text, View } from 'react-native';
+import { FlatList, Pressable, Text, View } from 'react-native';
 import Animated, {
   FadeInDown,
   useAnimatedStyle,
@@ -14,6 +14,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { showError } from '@/components/AppDialog';
 import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
 import { Counter } from '@/components/Counter';
@@ -21,7 +22,13 @@ import { formatRemaining, formatSince } from '@/lib/time';
 import { colors } from '@/theme/colors';
 
 import { DURATIONS, FOCUS_OPTIONS } from './constants';
-import { useCheckIn, useCheckOut, useLiveAtGym, useMyCheckin, type LiveMember } from './useLive';
+import {
+  useCheckIn,
+  useCheckOut,
+  useLiveAtGym,
+  useMyCheckin,
+  type LiveMember,
+} from './useLive';
 
 // Point lumineux qui « pulse » : signale l'état en direct (figé si Reduce Motion).
 function PulseDot() {
@@ -60,7 +67,14 @@ function LiveCard({
         className="w-36 items-center gap-1.5 rounded-4xl border border-border bg-surface p-3"
       >
         {/* Anneau ember : LA marque visuelle du « live » (personne présente). */}
-        <View style={{ padding: 2.5, borderRadius: 28, borderWidth: 2, borderColor: colors.ember }}>
+        <View
+          style={{
+            padding: 2.5,
+            borderRadius: 28,
+            borderWidth: 2,
+            borderColor: colors.ember,
+          }}
+        >
           {member.avatar_url ? (
             <Image
               source={member.avatar_url}
@@ -81,7 +95,9 @@ function LiveCard({
         <View className="rounded-full bg-ember/20 px-2 py-0.5">
           <Text className="text-xs font-semibold text-ember">{member.focus}</Text>
         </View>
-        <Text className="text-[11px] text-muted">ici depuis {formatSince(member.since)}</Text>
+        <Text className="text-[11px] text-muted">
+          ici depuis {formatSince(member.since)}
+        </Text>
         {hasIntent && (
           <View className="rounded-full bg-primary/20 px-2 py-0.5">
             <Text className="text-[11px] font-bold text-primary">Partant·e</Text>
@@ -120,14 +136,14 @@ export function LiveSection({
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       setExpanded(false);
     } catch (e) {
-      Alert.alert('Erreur', e instanceof Error ? e.message : 'Check-in impossible');
+      showError(e instanceof Error ? e.message : 'Check-in impossible');
     }
   }
 
   return (
     <View className="gap-3 pb-2">
       {/* Titre + compteur vivant */}
-      <View className="flex-row items-baseline gap-1.5">
+      <View className="flex-row items-center gap-1.5">
         <Text className="font-head text-xs uppercase tracking-widest text-muted">
           En ce moment
         </Text>
@@ -176,7 +192,11 @@ export function LiveSection({
                 Affiche-toi pour trouver un partenaire, là, maintenant.
               </Text>
             </View>
-            <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={18} color={colors.muted} />
+            <Ionicons
+              name={expanded ? 'chevron-up' : 'chevron-down'}
+              size={18}
+              color={colors.muted}
+            />
           </Pressable>
 
           {expanded && (
@@ -186,7 +206,12 @@ export function LiveSection({
               </Text>
               <View className="flex-row flex-wrap gap-2">
                 {FOCUS_OPTIONS.map((f) => (
-                  <Chip key={f} label={f} active={focus === f} onPress={() => setFocus(f)} />
+                  <Chip
+                    key={f}
+                    label={f}
+                    active={focus === f}
+                    onPress={() => setFocus(f)}
+                  />
                 ))}
               </View>
               <Text className="font-head text-xs uppercase tracking-widest text-muted">

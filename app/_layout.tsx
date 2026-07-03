@@ -17,6 +17,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Text, TextInput } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { DialogHost } from '@/components/AppDialog';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AuthProvider, useAuth } from '@/features/auth/AuthProvider';
 import { useMyProfile } from '@/features/profile/useMyProfile';
@@ -76,7 +77,13 @@ function RootNavigation() {
   }, [session, onboarded]);
 
   return (
-    <Stack screenOptions={{ headerShown: false, animation: 'fade', contentStyle: { backgroundColor: colors.background } }}>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        animation: 'fade',
+        contentStyle: { backgroundColor: colors.background },
+      }}
+    >
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="select-gym" options={{ presentation: 'modal' }} />
@@ -131,6 +138,7 @@ export default function RootLayout() {
           <AuthProvider>
             <StatusBar style="light" />
             <RootNavigation />
+            <DialogHost />
           </AuthProvider>
         </QueryClientProvider>
       </ErrorBoundary>
