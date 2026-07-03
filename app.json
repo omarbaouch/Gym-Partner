@@ -22,7 +22,9 @@
       "bundleIdentifier": "com.gympartner.app",
       "usesAppleSignIn": true,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Gym Partner utilise votre position pour trouver les salles de sport proches de vous."
+        "NSLocationWhenInUseUsageDescription": "Gym Partner utilise votre position pour trouver les salles de sport proches de vous.",
+        "NSPhotoLibraryUsageDescription": "Gym Partner accède à vos photos pour définir votre photo de profil.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {

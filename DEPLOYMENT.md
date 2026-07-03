@@ -289,16 +289,34 @@ Developer** (99 $/an) et, pour builder, soit un Mac, soit EAS Build (cloud, sans
 > `supabase.auth.signInWithIdToken({ provider: 'apple' })`
 > (`src/features/auth/AppleSignInButton.tsx`). Le bouton ne s'affiche que sur iOS.
 
-### c. Builder et tester
+### c. Configurer les certificats (une seule fois, en interactif)
+
+Le workflow GitHub échoue tant que les identifiants Apple ne sont pas
+enregistrés sur EAS (`couldn't find any credentials suitable for internal
+distribution`). Depuis ton poste, connecté à ton compte Expo :
 
 ```bash
-eas build -p ios --profile preview          # build interne (simulateur/ad hoc)
-eas build -p ios --profile production        # build App Store
+eas credentials -p ios        # connexion Apple → EAS crée certificat + profil
 ```
 
-EAS demande tes identifiants Apple et génère certificats + provisioning profiles.
+Pour installer un build `preview` (ad hoc) sur un iPhone, enregistre d'abord
+l'appareil (QR code à scanner avec l'iPhone), **avant** de builder :
 
-### d. TestFlight / App Store
+```bash
+eas device:create
+```
+
+### d. Builder et tester
+
+```bash
+eas build -p ios --profile preview          # build interne (appareils enregistrés)
+eas build -p ios --profile production        # build App Store / TestFlight
+```
+
+Une fois les certificats en place, le workflow GitHub **Build app** fonctionne
+aussi en choisissant `ios` (il tourne en non-interactif).
+
+### e. TestFlight / App Store
 
 ```bash
 eas submit -p ios                            # envoie le build à App Store Connect
