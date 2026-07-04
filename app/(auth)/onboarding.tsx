@@ -5,6 +5,7 @@ import { Pressable, Text, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 import { Button } from '@/components/Button';
+import { Mascot, type MascotVariant } from '@/components/Mascot';
 import { Screen } from '@/components/Screen';
 import { SkeletonList } from '@/components/Skeleton';
 import { ProfileForm } from '@/features/profile/ProfileForm';
@@ -12,13 +13,17 @@ import { useMyProfile } from '@/features/profile/useMyProfile';
 import { colors } from '@/theme/colors';
 
 // 3 écrans qui vendent le POURQUOI avant de collecter le profil.
+// La mascotte incarne l'accueil (slide 1) et la motivation (slide 3) ;
+// le slide central garde une icône (respiration, pas de surcharge).
 const SLIDES: {
   icon: keyof typeof Ionicons.glyphMap;
+  mascot?: MascotVariant;
   title: string;
   text: string;
 }[] = [
   {
     icon: 'flash',
+    mascot: 'hello',
     title: 'Ta salle, en direct.',
     text: "Vois qui s'entraîne dans ta salle, maintenant — et ce qu'ils sont venus bosser.",
   },
@@ -29,6 +34,7 @@ const SLIDES: {
   },
   {
     icon: 'calendar',
+    mascot: 'flex',
     title: 'De la rencontre à la séance.',
     text: 'Proposez un créneau, confirmez, retrouvez-vous sous la barre. On se motive mieux à deux.',
   },
@@ -84,12 +90,16 @@ export default function Onboarding() {
           entering={FadeInDown.duration(400)}
           className="items-center gap-6"
         >
-          <View
-            className="items-center justify-center rounded-full border border-border bg-surfaceHigh"
-            style={{ height: 120, width: 120 }}
-          >
-            <Ionicons name={slide.icon} size={56} color={colors.primary} />
-          </View>
+          {slide.mascot ? (
+            <Mascot variant={slide.mascot} size={188} />
+          ) : (
+            <View
+              className="items-center justify-center rounded-full border border-border bg-surfaceHigh"
+              style={{ height: 120, width: 120 }}
+            >
+              <Ionicons name={slide.icon} size={56} color={colors.primary} />
+            </View>
+          )}
           <View className="items-center gap-3">
             <Text className="text-center font-display text-3xl text-white">
               {slide.title}

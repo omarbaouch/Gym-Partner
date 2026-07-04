@@ -19,6 +19,7 @@ import { ScalePressable } from '@/components/ScalePressable';
 import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
 import { Counter } from '@/components/Counter';
+import { Mascot } from '@/components/Mascot';
 import { formatRemaining, formatSince } from '@/lib/time';
 import { colors } from '@/theme/colors';
 
@@ -260,9 +261,12 @@ export function LiveSection({
           )}
         />
       ) : (
-        <Text className="text-sm text-muted">
-          Personne ne s'est encore signalé — sois le premier à t'afficher 🔥
-        </Text>
+        <View className="items-center gap-2 py-2">
+          <Mascot variant="hello" size={132} />
+          <Text className="text-center text-sm text-muted">
+            Personne ne s'est encore signalé — sois le premier à t'afficher 🔥
+          </Text>
+        </View>
       )}
     </View>
   );
