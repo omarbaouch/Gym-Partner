@@ -261,9 +261,9 @@ export function LiveSection({
           )}
         />
       ) : (
-        <View className="items-center gap-2 py-2">
-          <Mascot variant="hello" size={132} />
-          <Text className="text-center text-sm text-muted">
+        <View className="flex-row items-center gap-3 py-1">
+          <Mascot variant="hello" size={64} />
+          <Text className="flex-1 text-sm text-muted">
             Personne ne s'est encore signalé — sois le premier à t'afficher 🔥
           </Text>
         </View>

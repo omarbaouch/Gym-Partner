@@ -91,7 +91,7 @@ export default function Onboarding() {
           className="items-center gap-6"
         >
           {slide.mascot ? (
-            <Mascot variant={slide.mascot} size={188} />
+            <Mascot variant={slide.mascot} size={132} />
           ) : (
             <View
               className="items-center justify-center rounded-full border border-border bg-surfaceHigh"

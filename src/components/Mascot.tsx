@@ -18,7 +18,7 @@ const SOURCES = {
 
 export function Mascot({
   variant,
-  size = 148,
+  size = 96,
 }: {
   variant: MascotVariant;
   size?: number;

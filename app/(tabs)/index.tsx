@@ -77,7 +77,6 @@ export default function Discover() {
       <Screen>
         <EmptyState
           icon="barbell"
-          mascot="hello"
           title="Choisis ta salle"
           subtitle="Découvre les membres qui s'entraînent au même endroit que toi."
         >
