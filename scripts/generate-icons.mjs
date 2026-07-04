@@ -1,83 +1,80 @@
-// Génère des icônes/splash placeholders valides (PNG 1024x1024) aux couleurs
-// de la marque, pour que `eas build` ne bloque pas. À remplacer par le vrai
-// design plus tard.
+// Identité visuelle de l'app : la marque « haltère + point live », dessinée en
+// vecteur puis rendue en PNG (icône, icône adaptative Android, splash).
 //
-// Usage : node scripts/generate-icons.mjs
-import { deflateSync } from 'node:zlib';
+// Direction : fond noir chaud, haltère géométrique aux traits ronds rempli du
+// dégradé de marque (l'un des TROIS usages autorisés du dégradé : le logo),
+// point ember en haut à droite = « en direct ». Lisible à 48 px.
+//
+// Usage : node scripts/generate-icons.mjs   (npm run icons)
 import { writeFileSync, mkdirSync } from 'node:fs';
+import sharp from 'sharp';
 
-const SIZE = 1024;
-const BG = [22, 14, 11]; // #160E0B (noir chaud)
-const PRIMARY = [255, 122, 26]; // #FF7A1A (orange vif)
+const BG = '#160E0B'; // noir chaud (colors.background)
+const EMBER = '#FF3D77'; // point « live » (colors.ember)
+const GRADIENT = ['#FFC53D', '#FF7A1A', '#FF3D77']; // gradients.brand
 
-const crcTable = (() => {
-  const t = [];
-  for (let n = 0; n < 256; n++) {
-    let c = n;
-    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
-    t[n] = c >>> 0;
-  }
-  return t;
-})();
+// La marque seule (haltère + point live), centrée dans un viewBox 1024.
+// `withBackground` : fond plein (icône/splash) ou transparent (adaptive).
+function markSvg({ withBackground, scale = 1 }) {
+  const s = scale;
+  // Géométrie autour du centre (512,512) — traits épais, bouts ronds.
+  const g = `
+    <g transform="translate(512 512) scale(${s}) translate(-512 -512)">
+      <!-- barre -->
+      <rect x="150" y="487" width="724" height="50" rx="25" fill="url(#brand)"/>
+      <!-- plaques intérieures (hautes) -->
+      <rect x="266" y="360" width="74" height="304" rx="37" fill="url(#brand)"/>
+      <rect x="684" y="360" width="74" height="304" rx="37" fill="url(#brand)"/>
+      <!-- plaques extérieures (basses) -->
+      <rect x="168" y="408" width="66" height="208" rx="33" fill="url(#brand)"/>
+      <rect x="790" y="408" width="66" height="208" rx="33" fill="url(#brand)"/>
+      <!-- point « live » : halo puis cœur ember -->
+      <circle cx="774" cy="290" r="64" fill="${EMBER}" opacity="0.28"/>
+      <circle cx="774" cy="290" r="38" fill="${EMBER}"/>
+    </g>`;
 
-function crc32(buf) {
-  let c = 0xffffffff;
-  for (let i = 0; i < buf.length; i++) c = crcTable[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
-  return (c ^ 0xffffffff) >>> 0;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="${GRADIENT[0]}"/>
+      <stop offset="0.5" stop-color="${GRADIENT[1]}"/>
+      <stop offset="1" stop-color="${GRADIENT[2]}"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.42" r="0.75">
+      <stop offset="0" stop-color="#2E2018"/>
+      <stop offset="1" stop-color="${BG}"/>
+    </radialGradient>
+  </defs>
+  ${withBackground ? `<rect width="1024" height="1024" fill="url(#glow)"/>` : ''}
+  ${g}
+</svg>`;
 }
 
-function chunk(type, data) {
-  const len = Buffer.alloc(4);
-  len.writeUInt32BE(data.length);
-  const typeBuf = Buffer.from(type, 'ascii');
-  const body = Buffer.concat([typeBuf, data]);
-  const crc = Buffer.alloc(4);
-  crc.writeUInt32BE(crc32(body));
-  return Buffer.concat([len, body, crc]);
+async function render(svg, path) {
+  await sharp(Buffer.from(svg)).png().toFile(path);
+  console.log('OK', path);
 }
-
-// pixel(x, y) -> [r, g, b]
-function makePng(pixel) {
-  const raw = Buffer.alloc((SIZE * 3 + 1) * SIZE);
-  let p = 0;
-  for (let y = 0; y < SIZE; y++) {
-    raw[p++] = 0; // filter type
-    for (let x = 0; x < SIZE; x++) {
-      const [r, g, b] = pixel(x, y);
-      raw[p++] = r;
-      raw[p++] = g;
-      raw[p++] = b;
-    }
-  }
-  const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(SIZE, 0);
-  ihdr.writeUInt32BE(SIZE, 4);
-  ihdr[8] = 8; // bit depth
-  ihdr[9] = 2; // color type RGB
-  const sig = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
-  return Buffer.concat([
-    sig,
-    chunk('IHDR', ihdr),
-    chunk('IDAT', deflateSync(raw)),
-    chunk('IEND', Buffer.alloc(0)),
-  ]);
-}
-
-const cx = SIZE / 2;
-const cy = SIZE / 2;
-const r2 = (SIZE * 0.32) ** 2;
-
-// Icône : pastille primaire centrée sur fond sombre.
-const icon = makePng((x, y) =>
-  (x - cx) ** 2 + (y - cy) ** 2 < r2 ? PRIMARY : BG,
-);
-const splash = makePng(() => BG);
-const adaptive = makePng((x, y) =>
-  (x - cx) ** 2 + (y - cy) ** 2 < r2 ? PRIMARY : BG,
-);
 
 mkdirSync('assets', { recursive: true });
-writeFileSync('assets/icon.png', icon);
-writeFileSync('assets/splash.png', splash);
-writeFileSync('assets/adaptive-icon.png', adaptive);
-console.log('Icônes générées dans assets/.');
+
+// Icône (iOS + fallback) : marque sur fond, légèrement réduite pour respirer.
+await render(markSvg({ withBackground: true, scale: 0.78 }), 'assets/icon.png');
+
+// Icône adaptative Android : marque SEULE sur transparent, dans la zone sûre
+// (cercle central ~66 %) — le fond vient de app.json (backgroundColor).
+await render(markSvg({ withBackground: false, scale: 0.58 }), 'assets/adaptive-icon.png');
+
+// Splash (resizeMode contain, fond #160E0B via app.json) : marque discrète.
+await render(markSvg({ withBackground: true, scale: 0.5 }), 'assets/splash.png');
+
+writeFileSync(
+  'assets/README.md',
+  `# Assets de marque
+
+Générés par \`npm run icons\` (scripts/generate-icons.mjs) : la marque
+« haltère + point live » en vecteur → icon.png, adaptive-icon.png (Android,
+transparent, zone sûre), splash.png. Modifier le SVG dans le script, jamais
+les PNG à la main.
+`,
+);
+console.log('Terminé.');

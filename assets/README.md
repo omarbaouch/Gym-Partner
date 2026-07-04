@@ -1,10 +1,6 @@
-# Assets
+# Assets de marque
 
-Ajoutez ici les images référencées dans `app.json` avant le premier build :
-
-- `icon.png` — 1024×1024
-- `adaptive-icon.png` — 1024×1024 (icône adaptative Android)
-- `splash.png` — écran de démarrage
-
-Tant qu'elles sont absentes, `expo start` affiche des avertissements mais
-fonctionne ; `eas build` nécessite ces fichiers.
+Générés par `npm run icons` (scripts/generate-icons.mjs) : la marque
+« haltère + point live » en vecteur → icon.png, adaptive-icon.png (Android,
+transparent, zone sûre), splash.png. Modifier le SVG dans le script, jamais
+les PNG à la main.
