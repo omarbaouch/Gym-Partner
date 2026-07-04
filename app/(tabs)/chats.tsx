@@ -1,9 +1,10 @@
 import { Image } from 'expo-image';
 import { Link, useFocusEffect } from 'expo-router';
 import { useCallback } from 'react';
-import { FlatList, Pressable, Text, View } from 'react-native';
+import { FlatList, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
+import { ScalePressable } from '@/components/ScalePressable';
 import { EmptyState } from '@/components/EmptyState';
 import { Screen } from '@/components/Screen';
 import { SkeletonList } from '@/components/Skeleton';
@@ -36,12 +37,14 @@ export default function Chats() {
           keyExtractor={(c) => c.conversation_id}
           ItemSeparatorComponent={() => <View className="h-3" />}
           renderItem={({ item, index }) => (
-            <Animated.View entering={FadeInDown.duration(320).delay(Math.min(index, 8) * 40)}>
+            <Animated.View
+              entering={FadeInDown.duration(320).delay(Math.min(index, 8) * 40)}
+            >
               <Link
                 href={{ pathname: '/chat/[id]', params: { id: item.conversation_id } }}
                 asChild
               >
-                <Pressable
+                <ScalePressable
                   accessibilityRole="button"
                   accessibilityLabel={
                     item.unread_count > 0
@@ -81,7 +84,7 @@ export default function Chats() {
                       </Text>
                     </View>
                   )}
-                </Pressable>
+                </ScalePressable>
               </Link>
             </Animated.View>
           )}

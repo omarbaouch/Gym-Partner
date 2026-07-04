@@ -15,6 +15,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { showError } from '@/components/AppDialog';
+import { ScalePressable } from '@/components/ScalePressable';
 import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
 import { Counter } from '@/components/Counter';
@@ -60,7 +61,7 @@ function LiveCard({
   const initials = member.display_name.slice(0, 2).toUpperCase();
   return (
     <Animated.View entering={FadeInDown.duration(300).delay(Math.min(index, 6) * 45)}>
-      <Pressable
+      <ScalePressable
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel={`${member.display_name}, ${member.focus}, ici depuis ${formatSince(member.since)}`}
@@ -103,7 +104,7 @@ function LiveCard({
             <Text className="text-[11px] font-bold text-primary">Partant·e</Text>
           </View>
         )}
-      </Pressable>
+      </ScalePressable>
     </Animated.View>
   );
 }

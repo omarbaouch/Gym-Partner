@@ -1,5 +1,20 @@
 # Plan de transformation — gagner le prix Meilleur concept / design
 
+> **État (04/07/2026)** — Phases 0 (Le Live), 1 (Match), 2 (Séances) : ✅ en prod.
+> Phase 4 : ✅ base fiabilisée (24 000 salles Google, anti-doublons, dialogues
+> thémés, changement de salle transactionnel). Phase 3 : ✅ interaction
+> signature livrée (`ScalePressable` : toute surface tapable répond sous le
+> doigt — enfoncement 0.97 + haptique + retour ressort ; une seule physique sur
+> cartes Live, membres, conversations, salles, puces, boutons ; « Réduire les
+> animations » respecté). Phase 5 : tagline ✅, onboarding ✅.
+>
+> **Spécifique Apple Design Award** (à ne pas confondre avec un prix de
+> hackathon) : l'ADA récompense des apps **publiées sur l'App Store**, jugées
+> sur Délice, Innovation, Interaction, Inclusivité, Visuels. Pré-requis durs
+> restants : compte Apple Developer + certificats EAS (DEPLOYMENT.md § 10),
+> build TestFlight, puis publication App Store. Sans publication, aucune
+> éligibilité — c'est l'étape 1 réelle.
+
 ## 1. Diagnostic sans complaisance (pourquoi l'app ne gagne pas aujourd'hui)
 
 1. **Le concept est un cliché** : « Tinder for gym » — liste de profils → profil

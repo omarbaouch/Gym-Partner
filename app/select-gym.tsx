@@ -16,6 +16,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Screen } from '@/components/Screen';
 import { SkeletonList } from '@/components/Skeleton';
 import { showError } from '@/components/AppDialog';
+import { ScalePressable } from '@/components/ScalePressable';
 import { chainLogoUrl, gymLogoUrl, normalizeChainName } from '@/features/gyms/chainLogo';
 import { GymMap } from '@/features/gyms/GymMap';
 import { gymSubtitle, formatDistance } from '@/features/gyms/gymLabel';
@@ -310,7 +311,7 @@ export default function SelectGym() {
               <Animated.View
                 entering={FadeInDown.duration(300).delay(Math.min(index, 8) * 35)}
               >
-                <Pressable
+                <ScalePressable
                   onPress={() => choose(item.id)}
                   disabled={!!selectingId}
                   accessibilityRole="button"
@@ -353,7 +354,7 @@ export default function SelectGym() {
                   ) : (
                     <Text className="text-2xl text-muted">›</Text>
                   )}
-                </Pressable>
+                </ScalePressable>
               </Animated.View>
             );
           }}

@@ -1,7 +1,10 @@
-import { Pressable, Text } from 'react-native';
+import { Text } from 'react-native';
+
+import { ScalePressable } from '@/components/ScalePressable';
 
 // Puce sélectionnable (filtres, options) — état actif : texte SOMBRE sur
 // primary (7.3:1), même règle que Button ; jamais de blanc sur orange (2.6:1).
+// Retour tactile signature sans haptique (surfaces tapées en rafale).
 export function Chip({
   label,
   active,
@@ -12,8 +15,9 @@ export function Chip({
   onPress: () => void;
 }) {
   return (
-    <Pressable
+    <ScalePressable
       onPress={onPress}
+      haptic={false}
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ selected: active }}
@@ -22,6 +26,6 @@ export function Chip({
       <Text className={active ? 'font-semibold text-background' : 'text-muted'}>
         {label}
       </Text>
-    </Pressable>
+    </ScalePressable>
   );
 }

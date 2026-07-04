@@ -16,6 +16,7 @@ import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
 import { Counter } from '@/components/Counter';
 import { EmptyState } from '@/components/EmptyState';
+import { ScalePressable } from '@/components/ScalePressable';
 import { Screen } from '@/components/Screen';
 import { SkeletonList } from '@/components/Skeleton';
 import {
@@ -193,7 +194,7 @@ export default function Discover() {
             <View className="gap-3 pb-3">
               {/* Prochaine séance confirmée : le résultat concret du match. */}
               {nextSession && (
-                <Pressable
+                <ScalePressable
                   onPress={() =>
                     router.push({
                       pathname: '/chat/[id]',
@@ -210,7 +211,7 @@ export default function Discover() {
                     {formatSessionDate(nextSession.scheduled_at)}
                   </Text>
                   <Ionicons name="chevron-forward" size={16} color={colors.muted} />
-                </Pressable>
+                </ScalePressable>
               )}
 
               {/* « Le Live » : le cœur de l'app — qui est là, maintenant. */}
@@ -279,7 +280,7 @@ function MemberCard({
   return (
     <Animated.View entering={FadeInDown.duration(350).delay(Math.min(index, 8) * 45)}>
       <Link href={{ pathname: '/member/[id]', params: { id: member.id } }} asChild>
-        <Pressable
+        <ScalePressable
           accessibilityRole="button"
           accessibilityLabel={`${member.display_name}, niveau ${member.level}`}
           className="flex-row items-center gap-3 rounded-4xl border border-border bg-surface p-4"
@@ -333,7 +334,7 @@ function MemberCard({
             </View>
           </View>
           <Text className="text-2xl text-muted">›</Text>
-        </Pressable>
+        </ScalePressable>
       </Link>
     </Animated.View>
   );
